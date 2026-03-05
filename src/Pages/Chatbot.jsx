@@ -1,81 +1,64 @@
 import { useState, useRef, useEffect } from "react";
 
-const SYSTEM_PROMPT = `You are RepairGenie, an AI-powered property maintenance assistant for the RepairGenie platform. You help property owners, managers, and tenants report and manage maintenance issues.
+const SYSTEM_PROMPT = `You are RepairGenie, a professional property maintenance assistant. You help property owners, managers, and tenants report and manage maintenance issues efficiently.
 
-Your job is to:
-1. Greet users warmly and ask about their maintenance issue
-2. Gather key information through friendly conversation:
-   - Problem description (what's wrong?)
-   - Location/room (where is it?)
-   - Urgency (emergency/high/medium/low)
+Your job:
+1. Start with a concise, professional greeting. Ask what maintenance issue the user needs help with.
+2. Gather key details through brief, focused questions (one at a time):
+   - Problem description
+   - Location or room
+   - Urgency (emergency / high / medium / low)
    - Category (plumbing, electrical, HVAC, structural, appliance, etc.)
-3. Once you have enough info, generate a structured ticket summary with:
-   - Ticket ID (format: RG-XXXXX with 5 random digits)
-   - Priority level (🔴 Emergency / 🟠 High / 🟡 Medium / 🟢 Low)
-   - Category with relevant emoji
-   - Estimated response time
-   - Recommended action
-4. Offer troubleshooting tips when appropriate
-5. Be concise but helpful. Use line breaks for readability.
-6. After ticket creation, ask if they want to track another issue or need anything else.
+3. Once you have enough information, generate a structured ticket summary.
+4. Offer brief, practical troubleshooting tips when relevant.
+5. After ticket creation, ask if they need to report another issue.
 
-Tone: Professional yet warm. Efficient. Reassuring.
+Response style:
+- Concise and professional. No emojis. No filler phrases.
+- Use plain language. Keep responses under 80 words unless generating a ticket.
+- One question per message.
 
-Format ticket summaries like this:
+Ticket format (use exactly):
 ---
-🎫 **TICKET CREATED**
-**ID:** RG-XXXXX
-**Issue:** [brief description]
-**Location:** [room/area]
-**Category:** [emoji + category]
-**Priority:** [emoji + level]
-**Est. Response:** [timeframe]
-**Next Steps:** [what happens now]
+MAINTENANCE TICKET
+ID: RG-XXXXX
+Issue: [brief description]
+Location: [room/area]
+Category: [category]
+Priority: [Emergency / High / Medium / Low]
+Est. Response: [timeframe based on priority]
+Next Steps: [what happens now]
 ---`;
 
 const WELCOME_MSG = {
   role: "assistant",
-  content: "👋 Welcome to **RepairGenie AI**! I'm your intelligent property maintenance assistant.\n\nI can help you report issues, create maintenance tickets, and get the right professionals on the job — fast.\n\nWhat maintenance issue can I help you with today?",
+  content: "Welcome to RepairGenie. Please describe the maintenance issue you need to report.",
 };
 
-const CHIPS = [
-  { icon: "🚰", text: "My kitchen sink is leaking" },
-  { icon: "❄️", text: "AC isn't cooling properly" },
-  { icon: "⚡", text: "Power outlet stopped working" },
-  { icon: "🏠", text: "Roof is making strange noises" },
+const QUICK_PROMPTS = [
+  "Kitchen sink is leaking under the cabinet",
+  "Air conditioning is not cooling",
+  "Electrical outlet has stopped working",
+  "There is a crack in the ceiling",
 ];
 
 let sessionCounter = 1;
 function makeSession(id) {
   return {
     id,
-    label: "New Conversation",
-    time: "Just now",
+    label: "New Session",
     messages: [{ ...WELCOME_MSG }],
     ticketCount: 0,
     createdAt: Date.now(),
   };
 }
 
-const Logo = ({ size = 36 }) => (
-  <svg width={size} height={size} viewBox="0 0 44 44" fill="none">
-    <rect width="44" height="44" rx="11" fill="url(#cg)" />
-    <defs>
-      <linearGradient id="cg" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse">
-        <stop stopColor="#1e6bff" /><stop offset="1" stopColor="#38bdf8" />
-      </linearGradient>
-    </defs>
-    <path d="M29 9.5c-3.6 0-6.5 2.9-6.5 6.5 0 .8.1 1.5.4 2.2L13.2 27.9c-.7-.3-1.4-.4-2.2-.4C7.4 27.5 4.5 30.4 4.5 34s2.9 6.5 6.5 6.5 6.5-2.9 6.5-6.5c0-.8-.1-1.5-.4-2.2L26.8 22.1c.7.3 1.4.4 2.2.4 3.6 0 6.5-2.9 6.5-6.5 0-1-.2-1.9-.6-2.8l-3.4 3.4-3-.8-.8-3 3.4-3.4c-.9-.5-1.9-.7-2.9-.7z" fill="white" opacity=".93" />
-    <circle cx="11" cy="34" r="2.6" fill="white" opacity=".6" />
-  </svg>
-);
-
 const TypingDots = () => (
-  <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "4px 2px" }}>
+  <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "2px 0" }}>
     {[0, 1, 2].map(i => (
       <div key={i} style={{
-        width: 7, height: 7, borderRadius: "50%", background: "#94a3b8",
-        animation: `typingBounce 1.3s ease-in-out ${i * 0.18}s infinite`,
+        width: 5, height: 5, borderRadius: "50%", background: "#9ca3af",
+        animation: `bounce 1.2s ease-in-out ${i * 0.15}s infinite`,
       }} />
     ))}
   </div>
@@ -83,12 +66,16 @@ const TypingDots = () => (
 
 function parseContent(text) {
   return text.split("\n").map((line, i, arr) => {
-    const html = line
+    const isTicketLine = line.startsWith("---") || line.startsWith("MAINTENANCE TICKET") || 
+      /^(ID|Issue|Location|Category|Priority|Est\. Response|Next Steps):/.test(line);
+    const formatted = line
       .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-      .replace(/^---$/, "<hr style='border:none;border-top:1px solid rgba(30,107,255,0.18);margin:10px 0' />");
+      .replace(/^(ID|Issue|Location|Category|Priority|Est\. Response|Next Steps):(.*)$/, 
+        '<span style="color:#374151;font-weight:600;letter-spacing:0.02em">$1:</span><span style="color:#111827">$2</span>');
+    if (line === "---") return <hr key={i} style={{ border: "none", borderTop: "1px solid #e5e7eb", margin: "6px 0" }} />;
     return (
       <span key={i}>
-        <span dangerouslySetInnerHTML={{ __html: html }} />
+        <span dangerouslySetInnerHTML={{ __html: formatted }} />
         {i < arr.length - 1 && <br />}
       </span>
     );
@@ -99,15 +86,14 @@ function timeLabel(ts) {
   const diff = Date.now() - ts;
   if (diff < 60000) return "Just now";
   if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-  if (diff < 86400000) return "Today";
-  return "Yesterday";
+  return "Today";
 }
 
 function getSessionLabel(session) {
   const userMsgs = session.messages.filter(m => m.role === "user");
-  if (userMsgs.length === 0) return "New Conversation";
+  if (userMsgs.length === 0) return "New Session";
   const first = userMsgs[0].content;
-  return first.length > 32 ? first.slice(0, 32) + "…" : first;
+  return first.length > 30 ? first.slice(0, 30) + "…" : first;
 }
 
 export default function RepairGenieChat() {
@@ -132,7 +118,7 @@ export default function RepairGenieChat() {
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 140) + "px";
+      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 130) + "px";
     }
   }, [input]);
 
@@ -178,13 +164,11 @@ export default function RepairGenieChat() {
 
     const prevMessages = activeSession.messages;
     const nextMessages = [...prevMessages, { role: "user", content: msg }];
-
     updateSession(activeId, s => ({ messages: nextMessages }));
     setLoading(true);
 
     try {
-      // ✅ CHANGED: calls your local proxy instead of Anthropic directly
-      const res = await fetch("/api/messages", {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -195,8 +179,8 @@ export default function RepairGenieChat() {
         }),
       });
       const data = await res.json();
-      const reply = data.content?.map(c => c.text || "").join("\n") || "Sorry, something went wrong.";
-      const hasTicket = reply.includes("TICKET CREATED");
+      const reply = data.content?.map(c => c.text || "").join("\n") || "An error occurred. Please try again.";
+      const hasTicket = reply.includes("MAINTENANCE TICKET");
 
       updateSession(activeId, s => ({
         messages: [...nextMessages, { role: "assistant", content: reply }],
@@ -204,7 +188,7 @@ export default function RepairGenieChat() {
       }));
     } catch {
       updateSession(activeId, s => ({
-        messages: [...nextMessages, { role: "assistant", content: "⚠️ Connection issue. Please try again." }],
+        messages: [...nextMessages, { role: "assistant", content: "Connection issue. Please try again." }],
       }));
     } finally {
       setLoading(false);
@@ -219,382 +203,441 @@ export default function RepairGenieChat() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Outfit:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
+
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html, body, #root { height: 100%; }
         body {
-          font-family: 'Outfit', sans-serif;
-          background: #f6f9ff;
-          color: #0f1623;
+          font-family: 'DM Sans', sans-serif;
+          background: #fafafa;
+          color: #111827;
           overflow: hidden;
           -webkit-font-smoothing: antialiased;
         }
+
         :root {
-          --blue: #1e6bff; --blue-d: #1352d4; --sky: #38bdf8;
-          --navy: #0c1a3a; --text: #0f1623; --muted: #64748b;
-          --border: #e2ecf8; --bg: #f6f9ff; --white: #ffffff;
-          --sw: 264px;
+          --accent: #1a1a2e;
+          --accent-light: #16213e;
+          --teal: #0d7377;
+          --teal-light: #14a085;
+          --border: #e5e7eb;
+          --muted: #6b7280;
+          --bg: #f9fafb;
+          --white: #ffffff;
+          --sw: 256px;
+          --radius: 8px;
         }
-        @keyframes typingBounce {
-          0%,60%,100%{transform:translateY(0);opacity:.5} 30%{transform:translateY(-5px);opacity:1}
+
+        @keyframes bounce {
+          0%,60%,100%{transform:translateY(0);opacity:0.4}
+          30%{transform:translateY(-4px);opacity:1}
         }
         @keyframes msgIn {
-          from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)}
+          from{opacity:0;transform:translateY(6px)}
+          to{opacity:1;transform:translateY(0)}
         }
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
         @keyframes slideL {
-          from{opacity:0;transform:translateX(-12px)} to{opacity:1;transform:translateX(0)}
+          from{opacity:0;transform:translateX(-8px)}
+          to{opacity:1;transform:translateX(0)}
         }
-        .shell { display:flex; height:100vh; width:100vw; overflow:hidden; background:var(--bg); }
+
+        .shell { display:flex; height:100vh; width:100vw; overflow:hidden; }
+
+        /* ── Sidebar ── */
         .sidebar {
           width:var(--sw); flex-shrink:0;
-          background:var(--white);
-          border-right:1px solid var(--border);
+          background:var(--accent);
           display:flex; flex-direction:column;
-          transition:width .3s cubic-bezier(.22,1,.36,1), opacity .28s;
+          transition:width .3s cubic-bezier(.22,1,.36,1), opacity .25s;
           overflow:hidden; position:relative; z-index:10;
         }
         .sidebar.closed { width:0; opacity:0; pointer-events:none; }
+
         .sb-head {
-          padding:16px 14px 12px;
-          border-bottom:1px solid var(--border);
-          display:flex; align-items:center; justify-content:space-between;
-          flex-shrink:0;
+          padding:20px 16px 16px;
+          border-bottom:1px solid rgba(255,255,255,.07);
+          display:flex; align-items:center; gap:10px; flex-shrink:0;
         }
-        .sb-logo { display:flex; align-items:center; gap:8px; }
-        .sb-brand {
-          font-family:'Cormorant Garamond',serif;
-          font-weight:700; font-size:18px; color:var(--navy);
-          white-space:nowrap; letter-spacing:-.2px;
+        .sb-wordmark {
+          font-family:'DM Serif Display', serif;
+          font-size:17px; color:#fff;
+          letter-spacing:-.2px; white-space:nowrap;
         }
+        .sb-wordmark span { color:#14a085; }
+
+        .sb-mark {
+          width:28px; height:28px; border-radius:6px;
+          background:var(--teal); display:flex;
+          align-items:center; justify-content:center; flex-shrink:0;
+        }
+
         .new-btn {
-          margin:12px 12px 8px;
-          padding:10px 14px;
-          background:linear-gradient(135deg,var(--blue),var(--blue-d));
-          border:none; border-radius:10px;
-          color:#fff; font-size:13.5px;
-          font-family:'Outfit',sans-serif; font-weight:600;
+          margin:12px 12px 10px;
+          padding:9px 14px;
+          background:rgba(255,255,255,.07);
+          border:1px solid rgba(255,255,255,.1);
+          border-radius:var(--radius);
+          color:rgba(255,255,255,.85); font-size:13px;
+          font-family:'DM Sans',sans-serif; font-weight:500;
           cursor:pointer; display:flex; align-items:center; gap:7px;
-          box-shadow:0 4px 14px rgba(30,107,255,.22);
-          transition:all .2s; white-space:nowrap;
-          flex-shrink:0;
+          transition:all .18s; white-space:nowrap; flex-shrink:0;
         }
-        .new-btn:hover { transform:translateY(-1px); box-shadow:0 7px 20px rgba(30,107,255,.32); }
+        .new-btn:hover {
+          background:rgba(255,255,255,.13);
+          color:#fff;
+        }
+
         .sb-section {
-          padding:8px 14px 3px;
-          font-size:11px; font-weight:700;
-          letter-spacing:1.5px; text-transform:uppercase;
-          color:#b0bcd0; white-space:nowrap; flex-shrink:0;
+          padding:10px 16px 4px;
+          font-size:10px; font-weight:600;
+          letter-spacing:1.8px; text-transform:uppercase;
+          color:rgba(255,255,255,.3); white-space:nowrap; flex-shrink:0;
         }
-        .hist-list { flex:1; overflow-y:auto; padding:3px 6px 10px; }
-        .hist-list::-webkit-scrollbar { width:3px; }
-        .hist-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+        .hist-list { flex:1; overflow-y:auto; padding:3px 8px 10px; }
+        .hist-list::-webkit-scrollbar { width:2px; }
+        .hist-list::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); }
+
         .hist-item {
           display:flex; align-items:center; gap:8px;
-          padding:8px 9px; border-radius:9px;
+          padding:8px 10px; border-radius:var(--radius);
           cursor:pointer; transition:background .15s;
-          animation:slideL .25s ease both;
+          animation:slideL .22s ease both;
           position:relative;
         }
-        .hist-item:hover { background:var(--bg); }
-        .hist-item.active { background:rgba(30,107,255,.07); }
+        .hist-item:hover { background:rgba(255,255,255,.06); }
+        .hist-item.active { background:rgba(13,115,119,.25); }
         .hist-item:hover .hist-del { opacity:1; }
-        .hist-ico {
-          width:28px; height:28px; border-radius:8px;
-          background:var(--bg); border:1px solid var(--border);
-          display:flex; align-items:center; justify-content:center;
-          font-size:13px; flex-shrink:0;
+
+        .hist-dot {
+          width:6px; height:6px; border-radius:50%;
+          background:rgba(255,255,255,.2); flex-shrink:0;
         }
-        .hist-item.active .hist-ico { background:rgba(30,107,255,.1); border-color:rgba(30,107,255,.2); }
+        .hist-item.active .hist-dot { background:var(--teal-light); }
+
         .hist-txt { flex:1; min-width:0; }
         .hist-label {
-          font-size:13px; font-weight:500; color:var(--text);
+          font-size:12.5px; font-weight:400; color:rgba(255,255,255,.7);
           overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
         }
-        .hist-time { font-size:11px; color:var(--muted); margin-top:1px; }
+        .hist-item.active .hist-label { color:#fff; font-weight:500; }
+        .hist-time { font-size:11px; color:rgba(255,255,255,.3); margin-top:1px; }
+
         .hist-del {
           opacity:0; position:absolute; right:8px;
-          width:22px; height:22px; border-radius:6px;
-          background:rgba(239,68,68,.08); border:none;
+          width:20px; height:20px; border-radius:4px;
+          background:rgba(239,68,68,.15); border:none;
           display:flex; align-items:center; justify-content:center;
           cursor:pointer; transition:all .15s; flex-shrink:0;
-          color:#ef4444;
+          color:rgba(239,68,68,.7);
         }
-        .hist-del:hover { background:rgba(239,68,68,.15); }
+        .hist-del:hover { background:rgba(239,68,68,.3); color:#ef4444; }
+
         .del-confirm {
           position:absolute; right:4px; top:50%; transform:translateY(-50%);
-          background:white; border:1px solid var(--border);
-          border-radius:10px; padding:6px 10px;
-          box-shadow:0 4px 20px rgba(0,0,0,.1);
+          background:#1f2937; border:1px solid rgba(255,255,255,.1);
+          border-radius:8px; padding:5px 9px;
+          box-shadow:0 4px 20px rgba(0,0,0,.3);
           display:flex; align-items:center; gap:6px;
-          z-index:20; white-space:nowrap; animation:fadeIn .15s ease both;
+          z-index:20; white-space:nowrap; animation:fadeIn .12s ease both;
         }
         .del-yes {
-          padding:3px 9px; background:#ef4444; border:none;
-          border-radius:6px; color:white; font-size:12px;
-          font-family:'Outfit',sans-serif; font-weight:600;
-          cursor:pointer; transition:background .15s;
+          padding:2px 8px; background:#ef4444; border:none;
+          border-radius:5px; color:white; font-size:11.5px;
+          font-family:'DM Sans',sans-serif; font-weight:600; cursor:pointer;
         }
-        .del-yes:hover { background:#dc2626; }
         .del-no {
-          padding:3px 9px; background:var(--bg); border:1px solid var(--border);
-          border-radius:6px; color:var(--muted); font-size:12px;
-          font-family:'Outfit',sans-serif; font-weight:500;
-          cursor:pointer;
+          padding:2px 8px; background:transparent;
+          border:1px solid rgba(255,255,255,.15);
+          border-radius:5px; color:rgba(255,255,255,.6); font-size:11.5px;
+          font-family:'DM Sans',sans-serif; cursor:pointer;
         }
-        .del-no:hover { border-color:var(--blue); color:var(--blue); }
+
         .sb-foot {
-          padding:10px 12px;
-          border-top:1px solid var(--border);
-          flex-shrink:0;
+          padding:12px 14px;
+          border-top:1px solid rgba(255,255,255,.07); flex-shrink:0;
         }
         .user-row {
           display:flex; align-items:center; gap:9px;
-          padding:7px 9px; border-radius:9px;
-          cursor:pointer; transition:background .15s; white-space:nowrap;
+          padding:6px 8px; border-radius:var(--radius); white-space:nowrap;
         }
-        .user-row:hover { background:var(--bg); }
         .user-av {
-          width:30px; height:30px; border-radius:8px;
-          background:linear-gradient(135deg,var(--blue),var(--sky));
+          width:28px; height:28px; border-radius:6px;
+          background:var(--teal);
           display:flex; align-items:center; justify-content:center;
-          color:white; font-size:12px; font-weight:700; flex-shrink:0;
+          color:white; font-size:11px; font-weight:600; flex-shrink:0;
+          letter-spacing:.5px;
         }
-        .user-name { font-size:13px; font-weight:600; color:var(--navy); }
-        .user-plan { font-size:11px; color:var(--muted); margin-top:1px; }
-        .main { flex:1; display:flex; flex-direction:column; min-width:0; background:var(--white); }
+        .user-name { font-size:12.5px; font-weight:500; color:rgba(255,255,255,.8); }
+        .user-plan { font-size:11px; color:rgba(255,255,255,.35); margin-top:1px; }
+
+        /* ── Main ── */
+        .main {
+          flex:1; display:flex; flex-direction:column;
+          min-width:0; background:var(--white);
+        }
+
         .topbar {
-          height:56px; padding:0 18px;
+          height:54px; padding:0 20px;
           border-bottom:1px solid var(--border);
           display:flex; align-items:center; justify-content:space-between;
-          background:rgba(255,255,255,.95); backdrop-filter:blur(12px);
-          flex-shrink:0; gap:10px;
+          background:var(--white); flex-shrink:0; gap:12px;
         }
         .topbar-l { display:flex; align-items:center; gap:10px; }
+
         .ico-btn {
-          width:32px; height:32px; background:transparent; border:none;
-          border-radius:7px; cursor:pointer;
+          width:30px; height:30px; background:transparent; border:none;
+          border-radius:6px; cursor:pointer;
           display:flex; align-items:center; justify-content:center;
           color:var(--muted); transition:all .15s; flex-shrink:0;
         }
-        .ico-btn:hover { background:var(--bg); color:var(--blue); }
+        .ico-btn:hover { background:var(--bg); color:#111827; }
+
         .topbar-title {
-          font-family:'Cormorant Garamond',serif;
-          font-size:17px; font-weight:700; color:var(--navy); white-space:nowrap;
+          font-family:'DM Serif Display', serif;
+          font-size:16px; color:#111827; white-space:nowrap; letter-spacing:-.2px;
         }
-        .topbar-sub { font-size:11.5px; color:var(--muted); margin-top:1px; white-space:nowrap; }
-        .topbar-r { display:flex; align-items:center; gap:7px; flex-shrink:0; }
-        .pill-green {
+        .topbar-sub {
+          font-size:11px; color:var(--muted); margin-top:1px;
+          white-space:nowrap; font-weight:300;
+        }
+
+        .topbar-r { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+
+        .status-badge {
           display:flex; align-items:center; gap:5px;
-          background:rgba(22,163,74,.07); border:1px solid rgba(22,163,74,.18);
-          color:#16a34a; padding:4px 11px; border-radius:20px;
-          font-size:12px; font-weight:600; white-space:nowrap;
+          background:transparent;
+          border:1px solid #d1fae5;
+          color:#059669; padding:4px 10px; border-radius:20px;
+          font-size:11.5px; font-weight:500; white-space:nowrap;
+          background:#f0fdf4;
         }
-        .pill-dot {
-          width:6px; height:6px; border-radius:50%; background:#16a34a; flex-shrink:0;
-          animation:pls 2s ease infinite;
+        .status-dot {
+          width:5px; height:5px; border-radius:50%; background:#10b981; flex-shrink:0;
+          animation:pulse 2.5s ease infinite;
         }
-        @keyframes pls { 0%,100%{opacity:1} 50%{opacity:.3} }
-        .pill-blue {
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+        .ticket-badge {
           display:flex; align-items:center; gap:5px;
-          background:rgba(30,107,255,.07); border:1px solid rgba(30,107,255,.15);
-          color:var(--blue); padding:4px 11px; border-radius:20px;
-          font-size:12px; font-weight:600; white-space:nowrap;
+          background:#f0f9ff; border:1px solid #bae6fd;
+          color:#0284c7; padding:4px 10px; border-radius:20px;
+          font-size:11.5px; font-weight:500; white-space:nowrap;
         }
+
         .topbar-btn {
-          height:32px; padding:0 13px;
-          background:transparent; border:1.5px solid var(--border);
-          border-radius:8px; font-size:13px;
-          font-family:'Outfit',sans-serif; font-weight:500;
-          color:var(--muted); cursor:pointer; transition:all .18s; white-space:nowrap;
+          height:30px; padding:0 12px;
+          background:transparent; border:1px solid var(--border);
+          border-radius:6px; font-size:12.5px;
+          font-family:'DM Sans',sans-serif; font-weight:500;
+          color:var(--muted); cursor:pointer; transition:all .15s; white-space:nowrap;
         }
-        .topbar-btn:hover { border-color:var(--blue); color:var(--blue); }
-        .topbar-btn.primary {
-          background:linear-gradient(135deg,var(--blue),var(--blue-d));
-          border:none; color:white;
-          box-shadow:0 3px 10px rgba(30,107,255,.25);
-        }
-        .topbar-btn.primary:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(30,107,255,.35); color:white; }
+        .topbar-btn:hover { border-color:#9ca3af; color:#111827; }
+
+        /* ── Messages ── */
         .msgs-wrap {
-          flex:1; overflow-y:auto; padding:24px 0;
+          flex:1; overflow-y:auto; padding:28px 0;
           scrollbar-width:thin; scrollbar-color:var(--border) transparent;
         }
-        .msgs-wrap::-webkit-scrollbar { width:4px; }
+        .msgs-wrap::-webkit-scrollbar { width:3px; }
         .msgs-wrap::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
         .msgs-inner {
-          max-width:740px; margin:0 auto;
-          padding:0 clamp(14px,4vw,28px);
-          display:flex; flex-direction:column; gap:4px;
+          max-width:700px; margin:0 auto;
+          padding:0 clamp(16px,4vw,32px);
+          display:flex; flex-direction:column; gap:6px;
         }
+
         .date-sep {
           display:flex; align-items:center; gap:10px;
-          padding:8px 0 6px; animation:fadeIn .4s ease both;
+          padding:6px 0 10px; animation:fadeIn .4s ease both;
         }
         .date-sep::before,.date-sep::after { content:''; flex:1; height:1px; background:var(--border); }
-        .date-sep span { font-size:11.5px; color:#b8c6d8; font-weight:500; white-space:nowrap; }
+        .date-sep span { font-size:11px; color:#d1d5db; font-weight:400; white-space:nowrap; letter-spacing:.5px; }
+
+        .intro-block {
+          padding:32px 0 16px;
+          display:flex; flex-direction:column; gap:6px;
+          animation:fadeIn .4s ease both;
+        }
+        .intro-label {
+          font-size:10.5px; font-weight:600;
+          letter-spacing:2px; text-transform:uppercase;
+          color:var(--teal); margin-bottom:2px;
+        }
+        .intro-h {
+          font-family:'DM Serif Display', serif;
+          font-size:22px; color:#111827; line-height:1.3;
+          letter-spacing:-.3px;
+        }
+        .intro-p {
+          font-size:13.5px; color:var(--muted);
+          line-height:1.65; max-width:400px; font-weight:300;
+        }
+
+        .quick-grid {
+          display:grid; grid-template-columns:1fr 1fr;
+          gap:8px; margin-top:20px; max-width:540px;
+        }
+        .quick-btn {
+          background:var(--bg); border:1px solid var(--border); border-radius:var(--radius);
+          padding:10px 14px; cursor:pointer;
+          font-size:13px; font-weight:400; color:#374151;
+          font-family:'DM Sans',sans-serif; text-align:left;
+          transition:all .15s; line-height:1.45;
+        }
+        .quick-btn:hover {
+          border-color:#9ca3af; background:var(--white);
+          color:#111827;
+        }
+
         .msg-row {
           display:flex; align-items:flex-end; gap:8px;
-          animation:msgIn .28s cubic-bezier(.22,1,.36,1) both;
+          animation:msgIn .25s cubic-bezier(.22,1,.36,1) both;
         }
         .msg-row.user { flex-direction:row-reverse; }
-        .msg-av {
-          width:28px; height:28px; border-radius:8px;
+
+        .av {
+          width:26px; height:26px; border-radius:6px;
           flex-shrink:0; display:flex; align-items:center; justify-content:center;
-          overflow:hidden;
+          font-size:10px; font-weight:700; letter-spacing:.5px;
         }
-        .msg-av.ai-av { background:transparent; }
-        .msg-av.user-av {
-          background:linear-gradient(135deg,var(--blue),var(--sky));
-          color:white; font-size:12px; font-weight:700;
-        }
-        .msg-bub {
-          max-width:min(73%,540px);
+        .av.ai { background:var(--accent); color:rgba(255,255,255,.9); }
+        .av.user { background:var(--teal); color:white; }
+
+        .bubble {
+          max-width:min(72%,520px);
           padding:11px 15px;
-          border-radius:15px;
-          font-size:14.5px; line-height:1.72;
+          border-radius:10px;
+          font-size:14px; line-height:1.75; font-weight:400;
         }
-        .msg-bub.ai { background:var(--bg); border:1px solid var(--border); color:var(--text); border-bottom-left-radius:3px; }
-        .msg-bub.user { background:linear-gradient(135deg,var(--blue),var(--blue-d)); color:white; border-bottom-right-radius:3px; box-shadow:0 3px 14px rgba(30,107,255,.2); }
-        .msg-bub.ticket { background:linear-gradient(140deg,#f0f6ff,#e6effd); border:1px solid rgba(30,107,255,.22); box-shadow:0 4px 22px rgba(30,107,255,.07); }
-        .typing-row { display:flex; align-items:flex-end; gap:8px; animation:msgIn .22s ease both; }
+        .bubble.ai {
+          background:var(--bg); border:1px solid var(--border);
+          color:#111827; border-bottom-left-radius:2px;
+        }
+        .bubble.user {
+          background:var(--accent); color:rgba(255,255,255,.92);
+          border-bottom-right-radius:2px;
+        }
+        .bubble.ticket {
+          background:#f8faff; border:1px solid #dbeafe;
+          font-family:'DM Sans',sans-serif; font-size:13.5px;
+        }
+
+        .typing-row { display:flex; align-items:flex-end; gap:8px; animation:msgIn .2s ease both; }
         .typing-bub {
           background:var(--bg); border:1px solid var(--border);
-          border-radius:15px; border-bottom-left-radius:3px;
-          padding:11px 15px; display:flex; align-items:center;
+          border-radius:10px; border-bottom-left-radius:2px;
+          padding:12px 15px; display:flex; align-items:center;
         }
-        .welcome {
-          display:flex; flex-direction:column; align-items:center;
-          text-align:center; padding:28px 0 20px;
-          animation:fadeIn .5s ease both;
-        }
-        .welcome-ico {
-          width:58px; height:58px; border-radius:16px;
-          background:linear-gradient(135deg,var(--blue),var(--sky));
-          display:flex; align-items:center; justify-content:center;
-          margin-bottom:14px; box-shadow:0 8px 26px rgba(30,107,255,.24);
-        }
-        .welcome-h {
-          font-family:'Cormorant Garamond',serif;
-          font-size:24px; font-weight:700; color:var(--navy); margin-bottom:7px;
-        }
-        .welcome-p { font-size:14.5px; color:var(--muted); line-height:1.65; max-width:360px; }
-        .chips-grid {
-          display:grid; grid-template-columns:1fr 1fr;
-          gap:9px; margin-top:24px;
-          width:100%; max-width:520px;
-        }
-        .chip {
-          background:var(--white); border:1px solid var(--border); border-radius:11px;
-          padding:12px 14px; cursor:pointer;
-          font-size:13.5px; font-weight:500; color:var(--text);
-          font-family:'Outfit',sans-serif; text-align:left;
-          transition:all .18s; line-height:1.4;
-          display:flex; align-items:center; gap:8px;
-        }
-        .chip:hover {
-          border-color:var(--blue); background:rgba(30,107,255,.03); color:var(--blue);
-          transform:translateY(-2px); box-shadow:0 4px 14px rgba(30,107,255,.1);
-        }
-        .chip-ico { font-size:16px; flex-shrink:0; }
+
+        /* ── Input ── */
         .input-zone {
-          padding:clamp(10px,2vw,16px) clamp(14px,4vw,28px);
+          padding:clamp(10px,2vw,16px) clamp(16px,4vw,32px);
           background:var(--white); border-top:1px solid var(--border); flex-shrink:0;
         }
-        .input-inner { max-width:740px; margin:0 auto; }
+        .input-inner { max-width:700px; margin:0 auto; }
+
         .input-box {
-          display:flex; align-items:flex-end; gap:9px;
-          background:var(--bg); border:1.5px solid var(--border);
-          border-radius:13px; padding:9px 9px 9px 15px;
-          transition:border-color .18s, box-shadow .18s;
+          display:flex; align-items:flex-end; gap:8px;
+          background:var(--bg); border:1px solid var(--border);
+          border-radius:10px; padding:9px 9px 9px 14px;
+          transition:border-color .15s, box-shadow .15s;
         }
-        .input-box:focus-within { border-color:rgba(30,107,255,.38); box-shadow:0 0 0 3px rgba(30,107,255,.05); }
+        .input-box:focus-within {
+          border-color:#9ca3af;
+          box-shadow:0 0 0 3px rgba(13,115,119,.06);
+        }
+
         .chat-ta {
           flex:1; background:transparent; border:none; outline:none;
-          font-size:14.5px; font-family:'Outfit',sans-serif;
-          color:var(--text); resize:none; line-height:1.6;
-          min-height:22px; max-height:140px; overflow-y:auto; padding:2px 0;
+          font-size:14px; font-family:'DM Sans',sans-serif; font-weight:400;
+          color:#111827; resize:none; line-height:1.6;
+          min-height:22px; max-height:130px; overflow-y:auto; padding:2px 0;
         }
-        .chat-ta::placeholder { color:#b8c6d8; }
-        .chat-ta::-webkit-scrollbar { width:3px; }
-        .chat-ta::-webkit-scrollbar-thumb { background:var(--border); }
+        .chat-ta::placeholder { color:#d1d5db; font-weight:300; }
+        .chat-ta::-webkit-scrollbar { width:2px; }
+
         .send-btn {
-          width:36px; height:36px; flex-shrink:0;
-          background:linear-gradient(135deg,var(--blue),var(--blue-d));
-          border:none; border-radius:9px;
+          width:33px; height:33px; flex-shrink:0;
+          background:var(--accent); border:none; border-radius:7px;
           display:flex; align-items:center; justify-content:center;
-          cursor:pointer; transition:all .18s;
-          box-shadow:0 3px 10px rgba(30,107,255,.26);
+          cursor:pointer; transition:all .15s;
         }
-        .send-btn:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 5px 15px rgba(30,107,255,.36); }
-        .send-btn:disabled { opacity:.32; cursor:not-allowed; transform:none; box-shadow:none; }
+        .send-btn:hover:not(:disabled) { background:var(--teal); }
+        .send-btn:disabled { opacity:.25; cursor:not-allowed; }
+
         .input-foot {
           display:flex; align-items:center; justify-content:center;
-          margin-top:8px; font-size:11px; color:#c4d0de; gap:5px;
+          margin-top:7px; font-size:10.5px; color:#d1d5db;
+          font-weight:300; letter-spacing:.2px;
         }
+
         .overlay {
           display:none; position:fixed; inset:0; z-index:300;
-          background:rgba(12,26,58,.3); backdrop-filter:blur(2px);
-          animation:fadeIn .2s ease both;
+          background:rgba(0,0,0,.25); animation:fadeIn .2s ease both;
         }
         .overlay.on { display:block; }
+
         @media (max-width:860px) {
-          :root { --sw:250px; }
-          .sidebar { position:fixed; top:0; left:0; bottom:0; z-index:400; box-shadow:4px 0 28px rgba(12,26,58,.1); }
+          :root { --sw:240px; }
+          .sidebar { position:fixed; top:0; left:0; bottom:0; z-index:400; box-shadow:6px 0 32px rgba(0,0,0,.15); }
           .sidebar.closed { width:0; }
           .overlay.on { display:block; }
-          .chips-grid { grid-template-columns:1fr; }
-          .msg-bub { max-width:min(86%,540px); }
+          .quick-grid { grid-template-columns:1fr; }
+          .bubble { max-width:min(84%,520px); }
           .topbar-sub { display:none; }
         }
-        @media (max-width:560px) {
-          .topbar { padding:0 10px; }
-          .topbar-title { font-size:15.5px; }
-          .pill-green span:not(.pill-dot) { display:none; }
-          .pill-green { padding:4px 7px; }
-          .msgs-inner { padding:0 10px; }
-          .input-zone { padding:8px 10px; }
-          .chips-grid { padding:0; }
-          .msg-bub { font-size:14px; padding:10px 12px; }
-          .pill-blue { display:none; }
-          .topbar-btn:not(.primary) { display:none; }
-        }
-        @media (min-width:1200px) {
-          .msgs-inner, .input-inner { max-width:800px; }
+        @media (max-width:540px) {
+          .topbar { padding:0 12px; }
+          .status-badge span:not(.status-dot) { display:none; }
+          .status-badge { padding:4px 7px; }
+          .ticket-badge { display:none; }
+          .topbar-btn { display:none; }
+          .msgs-inner { padding:0 12px; }
+          .input-zone { padding:8px 12px; }
+          .bubble { font-size:13.5px; }
+          .intro-h { font-size:19px; }
         }
       `}</style>
 
-      <div className={`overlay ${sidebarOpen && window.innerWidth <= 860 ? "on" : ""}`}
-        onClick={() => setSidebarOpen(false)} />
+      <div
+        className={`overlay ${sidebarOpen && typeof window !== "undefined" && window.innerWidth <= 860 ? "on" : ""}`}
+        onClick={() => setSidebarOpen(false)}
+      />
 
       <div className="shell">
+
+        {/* Sidebar */}
         <aside className={`sidebar ${sidebarOpen ? "" : "closed"}`}>
           <div className="sb-head">
-            <div className="sb-logo">
-              <Logo size={28} />
-              <span className="sb-brand">RepairGenie</span>
+            <div className="sb-mark">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </div>
+            <span className="sb-wordmark">Repair<span>Genie</span></span>
           </div>
 
           <button className="new-btn" onClick={newChat}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-              <path d="M12 5v14M5 12h14" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+              <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/>
             </svg>
-            New Conversation
+            New Session
           </button>
 
-          <div className="sb-section">Conversations</div>
+          <div className="sb-section">History</div>
 
           <div className="hist-list">
             {sessions.map((s, i) => (
               <div
                 key={s.id}
                 className={`hist-item ${s.id === activeId ? "active" : ""}`}
-                style={{ animationDelay: `${i * 0.04}s` }}
+                style={{ animationDelay: `${i * 0.035}s` }}
                 onClick={() => switchSession(s.id)}
               >
-                <div className="hist-ico">
-                  {s.messages.filter(m => m.role === "user").length === 0 ? "💬" : "🎫"}
-                </div>
+                <div className="hist-dot" />
                 <div className="hist-txt">
                   <div className="hist-label">{getSessionLabel(s)}</div>
                   <div className="hist-time">
@@ -605,7 +648,7 @@ export default function RepairGenieChat() {
 
                 {deleteConfirm === s.id ? (
                   <div className="del-confirm" onClick={e => e.stopPropagation()}>
-                    <span style={{ fontSize: 12, color: "var(--muted)" }}>Delete?</span>
+                    <span style={{ fontSize: 11, color: "rgba(255,255,255,.5)" }}>Delete?</span>
                     <button className="del-yes" onClick={() => deleteSession(s.id)}>Yes</button>
                     <button className="del-no" onClick={() => setDeleteConfirm(null)}>No</button>
                   </div>
@@ -615,8 +658,8 @@ export default function RepairGenieChat() {
                     title="Delete"
                     onClick={e => { e.stopPropagation(); setDeleteConfirm(s.id); }}
                   >
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
-                      <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                      <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
                     </svg>
                   </button>
                 )}
@@ -635,42 +678,44 @@ export default function RepairGenieChat() {
           </div>
         </aside>
 
+        {/* Main */}
         <main className="main">
           <div className="topbar">
             <div className="topbar-l">
               <button className="ico-btn" onClick={() => setSidebarOpen(v => !v)}>
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-                  <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
                 </svg>
               </button>
               <div>
-                <div className="topbar-title">AI Maintenance Assistant</div>
+                <div className="topbar-title">Maintenance Assistant</div>
                 <div className="topbar-sub">RepairGenie · Powered by Claude</div>
               </div>
             </div>
 
             <div className="topbar-r">
-              <div className="pill-green">
-                <span className="pill-dot" />
+              <div className="status-badge">
+                <span className="status-dot" />
                 <span>Online</span>
               </div>
               {ticketCount > 0 && (
-                <div className="pill-blue">
-                  🎫 {ticketCount} ticket{ticketCount > 1 ? "s" : ""}
+                <div className="ticket-badge">
+                  {ticketCount} Ticket{ticketCount > 1 ? "s" : ""}
                 </div>
               )}
-              <button className="topbar-btn" onClick={newChat}>+ New Chat</button>
+              <button className="topbar-btn" onClick={newChat}>New Session</button>
             </div>
           </div>
 
           <div className="msgs-wrap">
             <div className="msgs-inner">
+
               {isOnlyWelcome && (
-                <div className="welcome">
-                  <div className="welcome-ico"><Logo size={32} /></div>
-                  <div className="welcome-h">How can I help you today?</div>
-                  <div className="welcome-p">
-                    Describe any property issue and I'll create a structured ticket, find the right professional, and keep you updated every step of the way.
+                <div className="intro-block">
+                  <div className="intro-label">RepairGenie</div>
+                  <div className="intro-h">How can we assist<br />you today?</div>
+                  <div className="intro-p">
+                    Report a maintenance issue and we'll create a structured ticket and coordinate the right response.
                   </div>
                 </div>
               )}
@@ -681,15 +726,11 @@ export default function RepairGenieChat() {
                 <div
                   key={i}
                   className={`msg-row ${m.role}`}
-                  style={{ animationDelay: `${Math.min(i * 0.03, 0.18)}s` }}
+                  style={{ animationDelay: `${Math.min(i * 0.025, 0.15)}s` }}
                 >
-                  {m.role === "assistant" && (
-                    <div className="msg-av ai-av"><Logo size={28} /></div>
-                  )}
-                  {m.role === "user" && (
-                    <div className="msg-av user-av">P</div>
-                  )}
-                  <div className={`msg-bub ${m.role === "assistant" ? "ai" : "user"} ${m.content.includes("TICKET CREATED") ? "ticket" : ""}`}>
+                  {m.role === "assistant" && <div className="av ai">RG</div>}
+                  {m.role === "user" && <div className="av user">PM</div>}
+                  <div className={`bubble ${m.role === "assistant" ? "ai" : "user"} ${m.content.includes("MAINTENANCE TICKET") ? "ticket" : ""}`}>
                     {parseContent(m.content)}
                   </div>
                 </div>
@@ -697,25 +738,20 @@ export default function RepairGenieChat() {
 
               {loading && (
                 <div className="typing-row">
-                  <div className="msg-av ai-av"><Logo size={28} /></div>
+                  <div className="av ai">RG</div>
                   <div className="typing-bub"><TypingDots /></div>
                 </div>
               )}
 
               {isOnlyWelcome && !loading && (
-                <div style={{ display: "flex", justifyContent: "center" }}>
-                  <div className="chips-grid">
-                    {CHIPS.map(s => (
-                      <button key={s.text} className="chip" onClick={() => send(s.text)}>
-                        <span className="chip-ico">{s.icon}</span>
-                        {s.text}
-                      </button>
-                    ))}
-                  </div>
+                <div className="quick-grid">
+                  {QUICK_PROMPTS.map(q => (
+                    <button key={q} className="quick-btn" onClick={() => send(q)}>{q}</button>
+                  ))}
                 </div>
               )}
 
-              <div ref={bottomRef} style={{ height: 6 }} />
+              <div ref={bottomRef} style={{ height: 4 }} />
             </div>
           </div>
 
@@ -725,7 +761,7 @@ export default function RepairGenieChat() {
                 <textarea
                   ref={textareaRef}
                   className="chat-ta"
-                  placeholder="Describe your maintenance issue…"
+                  placeholder="Describe the maintenance issue…"
                   value={input}
                   rows={1}
                   disabled={loading}
@@ -733,14 +769,13 @@ export default function RepairGenieChat() {
                   onKeyDown={onKey}
                 />
                 <button className="send-btn" disabled={!input.trim() || loading} onClick={() => send()}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                    <path d="M22 2L11 13" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </button>
               </div>
               <div className="input-foot">
-                RepairGenie AI · Powered by Anthropic · Enter to send, Shift+Enter for new line
+                Enter to send · Shift+Enter for new line · RepairGenie by Anthropic
               </div>
             </div>
           </div>

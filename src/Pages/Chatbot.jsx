@@ -66,11 +66,9 @@ const TypingDots = () => (
 
 function parseContent(text) {
   return text.split("\n").map((line, i, arr) => {
-    const isTicketLine = line.startsWith("---") || line.startsWith("MAINTENANCE TICKET") || 
-      /^(ID|Issue|Location|Category|Priority|Est\. Response|Next Steps):/.test(line);
     const formatted = line
       .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-      .replace(/^(ID|Issue|Location|Category|Priority|Est\. Response|Next Steps):(.*)$/, 
+      .replace(/^(ID|Issue|Location|Category|Priority|Est\. Response|Next Steps):(.*)$/,
         '<span style="color:#374151;font-weight:600;letter-spacing:0.02em">$1:</span><span style="color:#111827">$2</span>');
     if (line === "---") return <hr key={i} style={{ border: "none", borderTop: "1px solid #e5e7eb", margin: "6px 0" }} />;
     return (
@@ -168,7 +166,8 @@ export default function RepairGenieChat() {
     setLoading(true);
 
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      // ✅ Proxy route — works on localhost and Vercel
+      const res = await fetch("/api/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -244,7 +243,6 @@ export default function RepairGenieChat() {
 
         .shell { display:flex; height:100vh; width:100vw; overflow:hidden; }
 
-        /* ── Sidebar ── */
         .sidebar {
           width:var(--sw); flex-shrink:0;
           background:var(--accent);
@@ -265,7 +263,6 @@ export default function RepairGenieChat() {
           letter-spacing:-.2px; white-space:nowrap;
         }
         .sb-wordmark span { color:#14a085; }
-
         .sb-mark {
           width:28px; height:28px; border-radius:6px;
           background:var(--teal); display:flex;
@@ -283,10 +280,7 @@ export default function RepairGenieChat() {
           cursor:pointer; display:flex; align-items:center; gap:7px;
           transition:all .18s; white-space:nowrap; flex-shrink:0;
         }
-        .new-btn:hover {
-          background:rgba(255,255,255,.13);
-          color:#fff;
-        }
+        .new-btn:hover { background:rgba(255,255,255,.13); color:#fff; }
 
         .sb-section {
           padding:10px 16px 4px;
@@ -303,8 +297,7 @@ export default function RepairGenieChat() {
           display:flex; align-items:center; gap:8px;
           padding:8px 10px; border-radius:var(--radius);
           cursor:pointer; transition:background .15s;
-          animation:slideL .22s ease both;
-          position:relative;
+          animation:slideL .22s ease both; position:relative;
         }
         .hist-item:hover { background:rgba(255,255,255,.06); }
         .hist-item.active { background:rgba(13,115,119,.25); }
@@ -372,11 +365,7 @@ export default function RepairGenieChat() {
         .user-name { font-size:12.5px; font-weight:500; color:rgba(255,255,255,.8); }
         .user-plan { font-size:11px; color:rgba(255,255,255,.35); margin-top:1px; }
 
-        /* ── Main ── */
-        .main {
-          flex:1; display:flex; flex-direction:column;
-          min-width:0; background:var(--white);
-        }
+        .main { flex:1; display:flex; flex-direction:column; min-width:0; background:var(--white); }
 
         .topbar {
           height:54px; padding:0 20px;
@@ -385,7 +374,6 @@ export default function RepairGenieChat() {
           background:var(--white); flex-shrink:0; gap:12px;
         }
         .topbar-l { display:flex; align-items:center; gap:10px; }
-
         .ico-btn {
           width:30px; height:30px; background:transparent; border:none;
           border-radius:6px; cursor:pointer;
@@ -393,25 +381,18 @@ export default function RepairGenieChat() {
           color:var(--muted); transition:all .15s; flex-shrink:0;
         }
         .ico-btn:hover { background:var(--bg); color:#111827; }
-
         .topbar-title {
           font-family:'DM Serif Display', serif;
           font-size:16px; color:#111827; white-space:nowrap; letter-spacing:-.2px;
         }
-        .topbar-sub {
-          font-size:11px; color:var(--muted); margin-top:1px;
-          white-space:nowrap; font-weight:300;
-        }
-
+        .topbar-sub { font-size:11px; color:var(--muted); margin-top:1px; white-space:nowrap; font-weight:300; }
         .topbar-r { display:flex; align-items:center; gap:8px; flex-shrink:0; }
 
         .status-badge {
           display:flex; align-items:center; gap:5px;
-          background:transparent;
-          border:1px solid #d1fae5;
+          background:#f0fdf4; border:1px solid #d1fae5;
           color:#059669; padding:4px 10px; border-radius:20px;
           font-size:11.5px; font-weight:500; white-space:nowrap;
-          background:#f0fdf4;
         }
         .status-dot {
           width:5px; height:5px; border-radius:50%; background:#10b981; flex-shrink:0;
@@ -435,7 +416,6 @@ export default function RepairGenieChat() {
         }
         .topbar-btn:hover { border-color:#9ca3af; color:#111827; }
 
-        /* ── Messages ── */
         .msgs-wrap {
           flex:1; overflow-y:auto; padding:28px 0;
           scrollbar-width:thin; scrollbar-color:var(--border) transparent;
@@ -468,13 +448,9 @@ export default function RepairGenieChat() {
         }
         .intro-h {
           font-family:'DM Serif Display', serif;
-          font-size:22px; color:#111827; line-height:1.3;
-          letter-spacing:-.3px;
+          font-size:22px; color:#111827; line-height:1.3; letter-spacing:-.3px;
         }
-        .intro-p {
-          font-size:13.5px; color:var(--muted);
-          line-height:1.65; max-width:400px; font-weight:300;
-        }
+        .intro-p { font-size:13.5px; color:var(--muted); line-height:1.65; max-width:400px; font-weight:300; }
 
         .quick-grid {
           display:grid; grid-template-columns:1fr 1fr;
@@ -487,10 +463,7 @@ export default function RepairGenieChat() {
           font-family:'DM Sans',sans-serif; text-align:left;
           transition:all .15s; line-height:1.45;
         }
-        .quick-btn:hover {
-          border-color:#9ca3af; background:var(--white);
-          color:#111827;
-        }
+        .quick-btn:hover { border-color:#9ca3af; background:var(--white); color:#111827; }
 
         .msg-row {
           display:flex; align-items:flex-end; gap:8px;
@@ -508,22 +481,12 @@ export default function RepairGenieChat() {
 
         .bubble {
           max-width:min(72%,520px);
-          padding:11px 15px;
-          border-radius:10px;
+          padding:11px 15px; border-radius:10px;
           font-size:14px; line-height:1.75; font-weight:400;
         }
-        .bubble.ai {
-          background:var(--bg); border:1px solid var(--border);
-          color:#111827; border-bottom-left-radius:2px;
-        }
-        .bubble.user {
-          background:var(--accent); color:rgba(255,255,255,.92);
-          border-bottom-right-radius:2px;
-        }
-        .bubble.ticket {
-          background:#f8faff; border:1px solid #dbeafe;
-          font-family:'DM Sans',sans-serif; font-size:13.5px;
-        }
+        .bubble.ai { background:var(--bg); border:1px solid var(--border); color:#111827; border-bottom-left-radius:2px; }
+        .bubble.user { background:var(--accent); color:rgba(255,255,255,.92); border-bottom-right-radius:2px; }
+        .bubble.ticket { background:#f8faff; border:1px solid #dbeafe; font-family:'DM Sans',sans-serif; font-size:13.5px; }
 
         .typing-row { display:flex; align-items:flex-end; gap:8px; animation:msgIn .2s ease both; }
         .typing-bub {
@@ -532,7 +495,6 @@ export default function RepairGenieChat() {
           padding:12px 15px; display:flex; align-items:center;
         }
 
-        /* ── Input ── */
         .input-zone {
           padding:clamp(10px,2vw,16px) clamp(16px,4vw,32px);
           background:var(--white); border-top:1px solid var(--border); flex-shrink:0;
@@ -545,10 +507,7 @@ export default function RepairGenieChat() {
           border-radius:10px; padding:9px 9px 9px 14px;
           transition:border-color .15s, box-shadow .15s;
         }
-        .input-box:focus-within {
-          border-color:#9ca3af;
-          box-shadow:0 0 0 3px rgba(13,115,119,.06);
-        }
+        .input-box:focus-within { border-color:#9ca3af; box-shadow:0 0 0 3px rgba(13,115,119,.06); }
 
         .chat-ta {
           flex:1; background:transparent; border:none; outline:none;
@@ -608,8 +567,6 @@ export default function RepairGenieChat() {
       />
 
       <div className="shell">
-
-        {/* Sidebar */}
         <aside className={`sidebar ${sidebarOpen ? "" : "closed"}`}>
           <div className="sb-head">
             <div className="sb-mark">
@@ -678,7 +635,6 @@ export default function RepairGenieChat() {
           </div>
         </aside>
 
-        {/* Main */}
         <main className="main">
           <div className="topbar">
             <div className="topbar-l">
@@ -709,7 +665,6 @@ export default function RepairGenieChat() {
 
           <div className="msgs-wrap">
             <div className="msgs-inner">
-
               {isOnlyWelcome && (
                 <div className="intro-block">
                   <div className="intro-label">RepairGenie</div>

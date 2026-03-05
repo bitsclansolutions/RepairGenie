@@ -1,0 +1,14 @@
+const callAPI = async (msgs) => {
+  const res = await fetch("/api/messages", {  // ← relative URL, not localhost:3000
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1000,
+      system: SYSTEM_PROMPT,
+      messages: msgs.map(m => ({ role: m.role, content: m.content })),
+    }),
+  });
+  const data = await res.json();
+  return data.content?.map(c => c.text || "").join("\n") || "";
+};

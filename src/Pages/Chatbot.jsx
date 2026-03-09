@@ -266,7 +266,7 @@ export default function RepairGenieChat() {
   };
 
   const callAPI = async (msgs) => {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+    const res = await fetch("/api/messages", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -276,6 +276,9 @@ export default function RepairGenieChat() {
         messages: msgs.map(m => ({ role: m.role, content: m.content })),
       }),
     });
+    if (!res.ok) {
+      throw new Error(`API error: ${res.status}`);
+    }
     const data = await res.json();
     return data.content?.map(c => c.text || "").join("\n") || "";
   };

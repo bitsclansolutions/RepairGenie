@@ -98,6 +98,7 @@ export default function RepairGenieLanding() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const goToChat = () => navigate("/chatbot");
+  const goToDashboard = () => navigate("/dashboard");
 
   useEffect(() => {
     const fn = () => { setScrolled(window.scrollY > 28); };
@@ -562,8 +563,8 @@ export default function RepairGenieLanding() {
           <li><a href="#pricing">Pricing</a></li>
         </ul>
         <div className="nav-cta">
-          <button className="btn-ghost" onClick={goToChat}>Log In</button>
-          <button className="btn-blue" onClick={goToChat}>Get Started</button>
+          <button className="btn-ghost" onClick={goToDashboard}>Log In</button>
+          <button className="btn-blue" onClick={goToDashboard}>Get Started</button>
         </div>
         <button
           className={`hamburger ${menuOpen ? "open" : ""}`}
@@ -580,8 +581,8 @@ export default function RepairGenieLanding() {
         <a href="#features" onClick={() => setMenuOpen(false)}>Features</a>
         <a href="#pricing" onClick={() => setMenuOpen(false)}>Pricing</a>
         <div className="mobile-menu-btns">
-          <button className="btn-ghost" onClick={goToChat}>Log In</button>
-          <button className="btn-blue" onClick={goToChat}>Get Started</button>
+          <button className="btn-ghost" onClick={goToDashboard}>Log In</button>
+          <button className="btn-blue" onClick={goToDashboard}>Get Started</button>
         </div>
       </div>
 

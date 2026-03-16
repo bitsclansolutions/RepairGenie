@@ -171,15 +171,14 @@ const IcoAnalytics   = () => <svg width="15" height="15" viewBox="0 0 24 24" fil
 const IcoProperties  = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
 const IcoSettings    = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
 const IcoArrow       = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>;
-const IcoTrend       = (up) => <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><polyline points={up ? "23 6 13.5 15.5 8.5 10.5 1 18" : "1 6 10.5 15.5 15.5 10.5 23 18"}/></svg>;
 
 const NAV_ITEMS = [
-  { key: "overview",    label: "Overview",       Icon: IcoOverview   },
-  { key: "tickets",     label: "Tickets",        Icon: IcoTickets    },
-  { key: "professionals",label: "Professionals", Icon: IcoPros       },
-  { key: "equipment",   label: "Equipment",      Icon: IcoEquipment  },
-  { key: "analytics",   label: "Analytics",      Icon: IcoAnalytics  },
-  { key: "properties",  label: "Properties",     Icon: IcoProperties },
+  { key: "overview",     label: "Overview",       Icon: IcoOverview   },
+  { key: "tickets",      label: "Tickets",        Icon: IcoTickets    },
+  { key: "professionals",label: "Professionals",  Icon: IcoPros       },
+  { key: "equipment",    label: "Equipment",      Icon: IcoEquipment  },
+  { key: "analytics",    label: "Analytics",      Icon: IcoAnalytics  },
+  { key: "properties",   label: "Properties",     Icon: IcoProperties },
 ];
 
 // ─── Badge components ────────────────────────────────────────────────────────
@@ -224,7 +223,7 @@ function KPICard({ label, value, sub, trend, trendUp, sparkData, color = "#1a5cf
           </span>
         )}
       </div>
-      <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:38, fontWeight:700, color:"#0f1623", lineHeight:1, marginBottom:6 }}>{value}</div>
+      <div style={{ fontSize:32, fontWeight:800, color:"#0f1623", lineHeight:1, marginBottom:6, fontFamily:"'Inter',sans-serif", letterSpacing:"-0.5px" }}>{value}</div>
       <div style={{ fontSize:12, color:"#6b7a90", fontWeight:400, marginBottom: sparkData ? 12 : 0 }}>{sub}</div>
       {sparkData && (
         <div style={{ height:36, marginTop:4 }}>
@@ -236,19 +235,28 @@ function KPICard({ label, value, sub, trend, trendUp, sparkData, color = "#1a5cf
 }
 
 // ─── Page: Overview ──────────────────────────────────────────────────────────
-function OverviewPage({ onNavigate }) {
-  const active  = TICKETS.filter(t => t.status !== "resolved").length;
-  const resolved= TICKETS.filter(t => t.status === "resolved").length;
-  const escalated = TICKETS.filter(t => t.status === "escalated").length;
-  const prosBusy = PROFESSIONALS.filter(p => p.status === "busy").length;
+function OverviewPage({ onNavigate, allTickets, liveTickets }) {
+  const active    = allTickets.filter(t => t.status !== "resolved").length;
+  const resolved  = allTickets.filter(t => t.status === "resolved").length;
+  const escalated = allTickets.filter(t => t.status === "escalated").length;
+  const prosBusy  = PROFESSIONALS.filter(p => p.status === "busy").length;
   const critEquip = EQUIPMENT.filter(e => e.status === "critical").length;
 
   return (
     <div className="db-page">
+      {/* Live tickets banner */}
+      {liveTickets.length > 0 && (
+        <div style={{ background:"#f0f4ff", border:"1px solid #c7d4ff", borderRadius:12, padding:"12px 16px", display:"flex", alignItems:"center", gap:10 }}>
+          <div style={{ width:6, height:6, borderRadius:"50%", background:"#1a5cff", animation:"dbPulse 2s ease infinite" }} />
+          <span style={{ fontSize:13, fontWeight:500, color:"#1a5cff" }}>{liveTickets.length} live ticket{liveTickets.length > 1 ? "s" : ""} incoming from RepairGenie chat</span>
+          <span style={{ fontSize:12, color:"#6b7a90", marginLeft:"auto" }}>Auto-synced · updating every 8s</span>
+        </div>
+      )}
+
       {/* KPI row */}
       <div className="db-kpi-grid">
         <KPICard label="Active Tickets"      value={active}    sub={`${escalated} escalated`}        trend="↑12% this week"  trendUp={false} sparkData={[8,12,10,15,14,11,active]} color="#1a5cff" />
-        <KPICard label="Resolved Today"      value={resolved}  sub="of 12 total tickets"             trend="↑8% vs yesterday" trendUp={true}  sparkData={[6,8,7,11,9,10,resolved]} color="#22c55e" />
+        <KPICard label="Resolved Today"      value={resolved}  sub="of total tickets"                trend="↑8% vs yesterday" trendUp={true}  sparkData={[6,8,7,11,9,10,resolved]} color="#22c55e" />
         <KPICard label="Avg Response Time"   value="28 min"    sub="across all categories"           trend="↓15% improvement" trendUp={true}  sparkData={[38,35,32,30,29,30,28]} color="#f59e0b" />
         <KPICard label="Satisfaction Score"  value="94%"       sub="based on 47 ratings"             trend="↑3% this month"   trendUp={true}  sparkData={[88,90,87,92,93,94,94]} color="#8b5cf6" />
       </div>
@@ -283,7 +291,7 @@ function OverviewPage({ onNavigate }) {
             <div style={{ position:"relative", display:"flex", alignItems:"center", justifyContent:"center" }}>
               <DonutChart data={STATUS_SEGMENTS} size={128} thickness={20} />
               <div style={{ position:"absolute", textAlign:"center" }}>
-                <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:26, fontWeight:700, color:"#0f1623", lineHeight:1 }}>{TICKETS.length}</div>
+                <div style={{ fontSize:26, fontWeight:800, color:"#0f1623", lineHeight:1, fontFamily:"'Inter',sans-serif", letterSpacing:"-0.5px" }}>{allTickets.length}</div>
                 <div style={{ fontSize:10, color:"#6b7a90", letterSpacing:"1px", textTransform:"uppercase" }}>Total</div>
               </div>
             </div>
@@ -322,8 +330,8 @@ function OverviewPage({ onNavigate }) {
                 </tr>
               </thead>
               <tbody>
-                {TICKETS.slice(0, 7).map(t => (
-                  <tr key={t.id}>
+                {allTickets.slice(0, 7).map(t => (
+                  <tr key={t.id} style={{ cursor:"default" }}>
                     <td><span style={{ fontFamily:"monospace", fontSize:11.5, color:"#1a5cff" }}>{t.id}</span></td>
                     <td>
                       <div style={{ fontSize:13, fontWeight:500, color:"#0f1623" }}>{t.issue}</div>
@@ -411,17 +419,17 @@ function OverviewPage({ onNavigate }) {
 }
 
 // ─── Page: Tickets ───────────────────────────────────────────────────────────
-function TicketsPage() {
+function TicketsPage({ allTickets }) {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const tabs = [
-    { key: "all",         label: "All",         count: TICKETS.length },
-    { key: "escalated",   label: "Escalated",   count: TICKETS.filter(t => t.status === "escalated").length },
-    { key: "in_progress", label: "In Progress", count: TICKETS.filter(t => t.status === "in_progress").length },
-    { key: "pending",     label: "Pending",     count: TICKETS.filter(t => t.status === "pending").length },
-    { key: "resolved",    label: "Resolved",    count: TICKETS.filter(t => t.status === "resolved").length },
+    { key: "all",         label: "All",         count: allTickets.length },
+    { key: "escalated",   label: "Escalated",   count: allTickets.filter(t => t.status === "escalated").length },
+    { key: "in_progress", label: "In Progress", count: allTickets.filter(t => t.status === "in_progress").length },
+    { key: "pending",     label: "Pending",     count: allTickets.filter(t => t.status === "pending").length },
+    { key: "resolved",    label: "Resolved",    count: allTickets.filter(t => t.status === "resolved").length },
   ];
-  const visible = TICKETS.filter(t =>
+  const visible = allTickets.filter(t =>
     (filter === "all" || t.status === filter) &&
     (t.issue.toLowerCase().includes(search.toLowerCase()) || t.id.toLowerCase().includes(search.toLowerCase()) || t.location.toLowerCase().includes(search.toLowerCase()))
   );
@@ -455,7 +463,7 @@ function TicketsPage() {
             </thead>
             <tbody>
               {visible.map(t => (
-                <tr key={t.id}>
+                <tr key={t.id} style={{ cursor:"default" }}>
                   <td><span style={{ fontFamily:"monospace", fontSize:11.5, color:"#1a5cff", fontWeight:600 }}>{t.id}</span></td>
                   <td><div style={{ fontSize:13, fontWeight:500, color:"#0f1623" }}>{t.issue}</div></td>
                   <td><span style={{ fontSize:12, color:"#6b7a90" }}>{t.location}</span></td>
@@ -484,15 +492,15 @@ function TicketsPage() {
 
 // ─── Page: Professionals ─────────────────────────────────────────────────────
 function ProfessionalsPage() {
-  const busy = PROFESSIONALS.filter(p => p.status === "busy").length;
+  const busy  = PROFESSIONALS.filter(p => p.status === "busy").length;
   const avail = PROFESSIONALS.filter(p => p.status === "available").length;
   return (
     <div className="db-page">
       <div style={{ display:"flex", gap:12, marginBottom:20 }}>
         {[["Total Field Staff", PROFESSIONALS.length, "#0f1623"],["On Active Jobs", busy, "#1a5cff"],["Available", avail, "#16a34a"],["Offline", PROFESSIONALS.filter(p => p.status==="offline").length, "#6b7a90"]].map(([l,v,c]) => (
-          <div key={l} style={{ flex:1, background:"#fff", border:"1px solid #e4eaf2", borderRadius:12, padding:"16px 18px" }}>
-            <div style={{ fontSize:11, fontWeight:600, letterSpacing:"1.2px", textTransform:"uppercase", color:"#6b7a90", marginBottom:8 }}>{l}</div>
-            <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:32, fontWeight:700, color:c, lineHeight:1 }}>{v}</div>
+          <div key={l} style={{ flex:1, background:"#fff", border:"1px solid #e4eaf2", borderRadius:16, padding:"16px 18px" }}>
+            <div style={{ fontSize:11, fontWeight:600, letterSpacing:"1.3px", textTransform:"uppercase", color:"#6b7a90", marginBottom:8 }}>{l}</div>
+            <div style={{ fontSize:32, fontWeight:800, color:c, lineHeight:1, fontFamily:"'Inter',sans-serif", letterSpacing:"-0.5px" }}>{v}</div>
           </div>
         ))}
       </div>
@@ -540,9 +548,9 @@ function EquipmentPage() {
     <div className="db-page">
       <div style={{ display:"flex", gap:12, marginBottom:20 }}>
         {[["Total Assets", EQUIPMENT.length, "#0f1623"],["Good Condition", good, "#16a34a"],["Needs Attention", fair, "#ca8a04"],["Critical", critical, "#dc2626"]].map(([l,v,c]) => (
-          <div key={l} style={{ flex:1, background:"#fff", border:"1px solid #e4eaf2", borderLeft: c === "#dc2626" && v > 0 ? "3px solid #ef4444" : undefined, borderRadius:12, padding:"16px 18px" }}>
-            <div style={{ fontSize:11, fontWeight:600, letterSpacing:"1.2px", textTransform:"uppercase", color:"#6b7a90", marginBottom:8 }}>{l}</div>
-            <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:32, fontWeight:700, color:c, lineHeight:1 }}>{v}</div>
+          <div key={l} style={{ flex:1, background:"#fff", border:"1px solid #e4eaf2", borderLeft: c === "#dc2626" && v > 0 ? "3px solid #ef4444" : undefined, borderRadius:16, padding:"16px 18px" }}>
+            <div style={{ fontSize:11, fontWeight:600, letterSpacing:"1.3px", textTransform:"uppercase", color:"#6b7a90", marginBottom:8 }}>{l}</div>
+            <div style={{ fontSize:32, fontWeight:800, color:c, lineHeight:1, fontFamily:"'Inter',sans-serif", letterSpacing:"-0.5px" }}>{v}</div>
           </div>
         ))}
       </div>
@@ -633,7 +641,7 @@ function AnalyticsPage() {
               <div className="db-card-title">Resolution Rate</div>
               <div className="db-card-sub">Percentage resolved within SLA</div>
             </div>
-            <span style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:26, fontWeight:700, color:"#16a34a" }}>91%</span>
+            <span style={{ fontSize:26, fontWeight:800, color:"#16a34a", fontFamily:"'Inter',sans-serif", letterSpacing:"-0.5px" }}>91%</span>
           </div>
           <LineChart values={RESOLVED_TREND} labels={MONTHLY_LABELS} color="#16a34a" h={140} />
         </div>
@@ -643,7 +651,7 @@ function AnalyticsPage() {
               <div className="db-card-title">Customer Satisfaction</div>
               <div className="db-card-sub">Average CSAT score</div>
             </div>
-            <span style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:26, fontWeight:700, color:"#8b5cf6" }}>96%</span>
+            <span style={{ fontSize:26, fontWeight:800, color:"#8b5cf6", fontFamily:"'Inter',sans-serif", letterSpacing:"-0.5px" }}>96%</span>
           </div>
           <LineChart values={SAT_TREND} labels={MONTHLY_LABELS} color="#8b5cf6" h={140} />
         </div>
@@ -656,9 +664,9 @@ function AnalyticsPage() {
           { label:"Repeat Issues Rate",         value:"6.2%", sub:"Down from 9.4% last quarter" },
           { label:"Cost Per Ticket",            value:"$48",  sub:"Including parts & labor" },
         ].map(s => (
-          <div key={s.label} style={{ background:"#fff", border:"1px solid #e4eaf2", borderRadius:12, padding:"16px 18px" }}>
-            <div style={{ fontSize:11, fontWeight:600, letterSpacing:"1.1px", textTransform:"uppercase", color:"#6b7a90", marginBottom:8 }}>{s.label}</div>
-            <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:28, fontWeight:700, color:"#0f1623", lineHeight:1, marginBottom:4 }}>{s.value}</div>
+          <div key={s.label} style={{ background:"#fff", border:"1px solid #e4eaf2", borderRadius:16, padding:"16px 18px" }}>
+            <div style={{ fontSize:11, fontWeight:600, letterSpacing:"1.3px", textTransform:"uppercase", color:"#6b7a90", marginBottom:8 }}>{s.label}</div>
+            <div style={{ fontSize:28, fontWeight:800, color:"#0f1623", lineHeight:1, marginBottom:4, fontFamily:"'Inter',sans-serif", letterSpacing:"-0.5px" }}>{s.value}</div>
             <div style={{ fontSize:11.5, color:"#6b7a90" }}>{s.sub}</div>
           </div>
         ))}
@@ -680,9 +688,9 @@ function PropertiesPage() {
           ["Occupancy Rate", `${Math.round(totalOcc/totalUnits*100)}%`, "#16a34a"],
           ["Active Tickets", PROPERTIES.reduce((s,p)=>s+p.activeTickets,0), "#f59e0b"],
         ].map(([l,v,c]) => (
-          <div key={l} style={{ flex:1, background:"#fff", border:"1px solid #e4eaf2", borderRadius:12, padding:"16px 18px" }}>
-            <div style={{ fontSize:11, fontWeight:600, letterSpacing:"1.2px", textTransform:"uppercase", color:"#6b7a90", marginBottom:8 }}>{l}</div>
-            <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:32, fontWeight:700, color:c, lineHeight:1 }}>{v}</div>
+          <div key={l} style={{ flex:1, background:"#fff", border:"1px solid #e4eaf2", borderRadius:16, padding:"16px 18px" }}>
+            <div style={{ fontSize:11, fontWeight:600, letterSpacing:"1.3px", textTransform:"uppercase", color:"#6b7a90", marginBottom:8 }}>{l}</div>
+            <div style={{ fontSize:32, fontWeight:800, color:c, lineHeight:1, fontFamily:"'Inter',sans-serif", letterSpacing:"-0.5px" }}>{v}</div>
           </div>
         ))}
       </div>
@@ -731,6 +739,7 @@ export default function Dashboard() {
   const [now, setNow] = useState(new Date());
   const [notifOpen, setNotifOpen] = useState(false);
   const [secondsAgo, setSecondsAgo] = useState(0);
+  const [liveTickets, setLiveTickets] = useState([]);
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -740,12 +749,26 @@ export default function Dashboard() {
     return () => clearInterval(t);
   }, []);
 
+  useEffect(() => {
+    const load = () => {
+      try {
+        const stored = JSON.parse(localStorage.getItem("rg_live_tickets") || "[]");
+        setLiveTickets(stored);
+      } catch(_) {}
+    };
+    load();
+    const t = setInterval(load, 8000);
+    return () => clearInterval(t);
+  }, []);
+
+  const allTickets = [...liveTickets, ...TICKETS];
+
   const PAGE_TITLES = { overview:"Overview", tickets:"Tickets", professionals:"Professionals", equipment:"Equipment", analytics:"Analytics", properties:"Properties" };
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&display=swap');
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         html,body,#root{height:100%}
         body{font-family:'Inter',sans-serif;background:#f7f9fc;color:#0f1623;-webkit-font-smoothing:antialiased;overflow:hidden}
@@ -777,8 +800,7 @@ export default function Dashboard() {
         .db-sb-av{width:28px;height:28px;border-radius:7px;background:rgba(26,92,255,.35);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600;flex-shrink:0}
 
         /* Top bar */
-        .db-topbar{height:56px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0}
-        .db-topbar-title{fontFamily:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:var(--navy);flex:1}
+        .db-topbar{height:58px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0;box-shadow:0 1px 0 #e4eaf2}
         .db-topbar-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
         .db-live-badge{display:flex;align-items:center;gap:5px;background:#f0fdf4;border:1px solid #d1fae5;color:#059669;padding:4px 10px;border-radius:20px;font-size:11.5px;font-weight:500}
         .db-live-dot{width:5px;height:5px;border-radius:50%;background:#10b981;animation:dbPulse 2s ease infinite;flex-shrink:0}
@@ -801,32 +823,32 @@ export default function Dashboard() {
         .db-two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 
         /* Cards */
-        .db-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+        .db-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
         .db-card-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:12px}
-        .db-card-title{font-size:14.5px;font-weight:600;color:var(--navy)}
+        .db-card-title{font-size:14px;font-weight:600;color:var(--navy);letter-spacing:-.1px}
         .db-card-sub{font-size:11.5px;color:var(--muted);font-weight:400;margin-top:2px}
         .db-link-btn{display:flex;align-items:center;gap:5px;background:transparent;border:none;font-size:12px;font-family:'Inter',sans-serif;font-weight:500;color:var(--blue);cursor:pointer;flex-shrink:0;transition:opacity .12s}
         .db-link-btn:hover{opacity:.75}
 
         /* KPI grid */
         .db-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-        .db-kpi{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px 20px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
-        .db-kpi-label{font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}
+        .db-kpi{background:#fff;border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+        .db-kpi-label{font-size:11px;font-weight:600;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
 
         /* Table */
         .db-table-wrap{overflow-x:auto;border-radius:8px}
         .db-table{width:100%;border-collapse:collapse;font-size:13px}
-        .db-table th{text-align:left;font-size:10.5px;font-weight:600;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);padding:10px 14px;border-bottom:1px solid var(--border);white-space:nowrap;background:#fafbfc}
-        .db-table td{padding:10px 14px;border-bottom:1px solid #f5f7fa;vertical-align:middle}
+        .db-table th{text-align:left;font-size:10px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted);padding:10px 14px;border-bottom:2px solid var(--border);white-space:nowrap;background:#fafbfc}
+        .db-table td{padding:11px 14px;border-bottom:1px solid #f5f7fa;vertical-align:middle;font-size:12.5px}
         .db-table tr:last-child td{border-bottom:none}
-        .db-table tr:hover td{background:#fafbfc}
+        .db-table tr:hover td{background:#f9fafc}
 
         @media(max-width:1100px){.db-kpi-grid{grid-template-columns:1fr 1fr}.db-two-col{grid-template-columns:1fr}}
         @media(max-width:820px){.db-sidebar{display:none}}
       `}</style>
 
       <div className="db-shell">
-        {/* ── SIDEBAR ── */}
+        {/* SIDEBAR */}
         <aside className="db-sidebar">
           <div className="db-sb-head" onClick={() => navigate("/")}>
             <div className="db-sb-mark">
@@ -843,9 +865,9 @@ export default function Dashboard() {
               <div key={key} className={`db-nav-item ${activePage === key ? "active" : ""}`} onClick={() => setActivePage(key)}>
                 <span className="db-nav-icon"><Icon /></span>
                 {label}
-                {key === "tickets" && TICKETS.filter(t => t.status === "escalated").length > 0 && (
+                {key === "tickets" && allTickets.filter(t => t.status === "escalated").length > 0 && (
                   <span style={{ marginLeft:"auto", background:"#ef4444", color:"#fff", borderRadius:20, padding:"1px 6px", fontSize:10, fontWeight:700 }}>
-                    {TICKETS.filter(t => t.status === "escalated").length}
+                    {allTickets.filter(t => t.status === "escalated").length}
                   </span>
                 )}
               </div>
@@ -868,17 +890,23 @@ export default function Dashboard() {
           </div>
         </aside>
 
-        {/* ── MAIN ── */}
+        {/* MAIN */}
         <div className="db-main">
           {/* Top bar */}
           <div className="db-topbar">
             <div style={{ flex:1 }}>
-              <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:18, fontWeight:700, color:"#0f1623", letterSpacing:"-.2px" }}>{PAGE_TITLES[activePage]}</div>
+              <div style={{ fontSize:18, fontWeight:700, color:"#0f1623", letterSpacing:"-.3px", fontFamily:"'Inter',sans-serif" }}>{PAGE_TITLES[activePage]}</div>
               <div style={{ fontSize:11, color:"#6b7a90", marginTop:1 }}>
                 {formatDate(now)} · Updated {secondsAgo < 5 ? "just now" : `${secondsAgo}s ago`}
               </div>
             </div>
             <div className="db-topbar-right">
+              {liveTickets.length > 0 && (
+                <div style={{ display:"flex", alignItems:"center", gap:5, background:"#f0f4ff", border:"1px solid #c7d4ff", color:"#1a5cff", padding:"4px 10px", borderRadius:20, fontSize:11.5, fontWeight:600, whiteSpace:"nowrap" }}>
+                  <span style={{ width:5, height:5, borderRadius:"50%", background:"#1a5cff", animation:"dbPulse 2s ease infinite", flexShrink:0 }} />
+                  {liveTickets.length} Live
+                </div>
+              )}
               <div className="db-live-badge"><span className="db-live-dot" />Live</div>
               <div className="db-clock">{formatClock(now)}</div>
               <div style={{ position:"relative" }}>
@@ -888,8 +916,9 @@ export default function Dashboard() {
                 </button>
                 {notifOpen && (
                   <div className="db-notif-drop">
-                    <div style={{ padding:"12px 16px 8px", borderBottom:"1px solid #e4eaf2" }}>
+                    <div style={{ padding:"12px 16px 8px", borderBottom:"1px solid #e4eaf2", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
                       <div style={{ fontSize:13, fontWeight:600, color:"#0f1623" }}>Notifications</div>
+                      <span style={{ fontSize:10, fontWeight:600, background:"#fef2f2", color:"#dc2626", border:"1px solid #fecaca", borderRadius:20, padding:"1px 7px" }}>{NOTIFICATIONS.length} unread</span>
                     </div>
                     {NOTIFICATIONS.map((n, i) => (
                       <div key={i} style={{ padding:"10px 16px", borderBottom: i < NOTIFICATIONS.length - 1 ? "1px solid #f5f7fa" : "none", display:"flex", gap:10 }}>
@@ -912,8 +941,8 @@ export default function Dashboard() {
 
           {/* Page content */}
           <div className="db-content" onClick={() => notifOpen && setNotifOpen(false)}>
-            {activePage === "overview"       && <OverviewPage onNavigate={setActivePage} />}
-            {activePage === "tickets"        && <TicketsPage />}
+            {activePage === "overview"       && <OverviewPage onNavigate={setActivePage} allTickets={allTickets} liveTickets={liveTickets} />}
+            {activePage === "tickets"        && <TicketsPage allTickets={allTickets} />}
             {activePage === "professionals"  && <ProfessionalsPage />}
             {activePage === "equipment"      && <EquipmentPage />}
             {activePage === "analytics"      && <AnalyticsPage />}

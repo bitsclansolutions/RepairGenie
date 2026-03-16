@@ -4,49 +4,49 @@ import { useNavigate } from "react-router-dom";
 // ─── Professional database — 2 per category ────────────────────────────────
 const PROFESSIONALS = {
   plumbing: [
-    { name: "James Hartley",  age: 41, title: "Licensed Master Plumber",     yearsExp: 17, timings: "Mon – Sat  ·  7:00 am – 7:00 pm", bio: "17 years in residential and commercial plumbing. IAPMO certified. Specialises in leak detection, emergency shut-off, and pipe rehabilitation.",            rate: 85,  eta: 25, distance: "1.4 mi", rating: 4.9, reviews: 142, avatar: "JH", speciality: "Leaks, Pipes & Fixtures",      phone: "+1 (555) 204-3871" },
-    { name: "Sandra Osei",    age: 36, title: "Journeyman Plumber",          yearsExp: 11, timings: "Mon – Fri  ·  8:00 am – 6:00 pm", bio: "Known for tidy, efficient work on drains, water heater installation, and bathroom remodelling. Highly rated for communication.",                         rate: 78,  eta: 40, distance: "2.8 mi", rating: 4.7, reviews: 98,  avatar: "SO", speciality: "Drainage & Water Heaters",  phone: "+1 (555) 318-7740" },
+    { name:"James Hartley", age:41, title:"Licensed Master Plumber", yearsExp:17, timings:"Mon – Sat · 7:00 am – 7:00 pm", bio:"17 years in residential and commercial plumbing. IAPMO certified. Specialises in leak detection, emergency shut-off, and pipe rehabilitation.", rate:85, eta:25, distance:"1.4 mi", rating:4.9, reviews:142, avatar:"JH", speciality:"Leaks, Pipes & Fixtures", phone:"+1 (555) 204-3871" },
+    { name:"Sandra Osei", age:36, title:"Journeyman Plumber", yearsExp:11, timings:"Mon – Fri · 8:00 am – 6:00 pm", bio:"Known for tidy, efficient work on drains, water heater installation, and bathroom remodelling. Highly rated for communication.", rate:78, eta:40, distance:"2.8 mi", rating:4.7, reviews:98, avatar:"SO", speciality:"Drainage & Water Heaters", phone:"+1 (555) 318-7740" },
   ],
   electrical: [
-    { name: "David Okafor",   age: 44, title: "Certified Master Electrician", yearsExp: 19, timings: "Mon – Sat  ·  8:00 am – 8:00 pm", bio: "19 years in panel upgrades, fault tracing, and residential rewiring. NEC code compliance specialist with 24/7 emergency availability.",                   rate: 95,  eta: 20, distance: "0.8 mi", rating: 4.9, reviews: 211, avatar: "DO", speciality: "Panels, Outlets & Wiring",  phone: "+1 (555) 471-2230" },
-    { name: "Mei-Lin Torres",  age: 33, title: "Licensed Electrician",        yearsExp: 9,  timings: "Mon – Fri  ·  7:00 am – 5:00 pm", bio: "Smart home integration, LED retrofits, and general outlet/switch repair. Fast, code-compliant work with excellent reviews.",                              rate: 88,  eta: 35, distance: "1.9 mi", rating: 4.8, reviews: 74,  avatar: "MT", speciality: "Smart Home & Outlets",      phone: "+1 (555) 562-9910" },
+    { name:"David Okafor", age:44, title:"Certified Master Electrician", yearsExp:19, timings:"Mon – Sat · 8:00 am – 8:00 pm", bio:"19 years in panel upgrades, fault tracing, and residential rewiring. NEC code compliance specialist with 24/7 emergency availability.", rate:95, eta:20, distance:"0.8 mi", rating:4.9, reviews:211, avatar:"DO", speciality:"Panels, Outlets & Wiring", phone:"+1 (555) 471-2230" },
+    { name:"Mei-Lin Torres", age:33, title:"Licensed Electrician", yearsExp:9, timings:"Mon – Fri · 7:00 am – 5:00 pm", bio:"Smart home integration, LED retrofits, and general outlet/switch repair. Fast, code-compliant work with excellent reviews.", rate:88, eta:35, distance:"1.9 mi", rating:4.8, reviews:74, avatar:"MT", speciality:"Smart Home & Outlets", phone:"+1 (555) 562-9910" },
   ],
   hvac: [
-    { name: "Carlos Reyes",   age: 38, title: "HVAC Master Technician",       yearsExp: 14, timings: "Mon – Sat  ·  7:00 am – 9:00 pm", bio: "14 years in AC diagnostics, refrigerant handling, and heating system repair. EPA Section 608 certified. Fast turnaround on all major brands.",          rate: 100, eta: 30, distance: "1.9 mi", rating: 4.8, reviews: 165, avatar: "CR", speciality: "AC, Heating & Duct Work",  phone: "+1 (555) 633-5509" },
-    { name: "Aisha Patel",    age: 29, title: "HVAC Technician",              yearsExp: 6,  timings: "Mon – Fri  ·  8:00 am – 6:00 pm", bio: "NATE certified. Focused on thermostat installation, filter maintenance, and seasonal tune-ups. Highly rated for transparency and reliability.",          rate: 90,  eta: 50, distance: "3.5 mi", rating: 4.6, reviews: 52,  avatar: "AP", speciality: "Thermostats & Tune-Ups",   phone: "+1 (555) 744-2287" },
+    { name:"Carlos Reyes", age:38, title:"HVAC Master Technician", yearsExp:14, timings:"Mon – Sat · 7:00 am – 9:00 pm", bio:"14 years in AC diagnostics, refrigerant handling, and heating system repair. EPA Section 608 certified. Fast turnaround on all major brands.", rate:100, eta:30, distance:"1.9 mi", rating:4.8, reviews:165, avatar:"CR", speciality:"AC, Heating & Duct Work", phone:"+1 (555) 633-5509" },
+    { name:"Aisha Patel", age:29, title:"HVAC Technician", yearsExp:6, timings:"Mon – Fri · 8:00 am – 6:00 pm", bio:"NATE certified. Focused on thermostat installation, filter maintenance, and seasonal tune-ups. Highly rated for transparency and reliability.", rate:90, eta:50, distance:"3.5 mi", rating:4.6, reviews:52, avatar:"AP", speciality:"Thermostats & Tune-Ups", phone:"+1 (555) 744-2287" },
   ],
   structural: [
-    { name: "Thomas Nguyen",  age: 49, title: "Licensed General Contractor",  yearsExp: 24, timings: "Mon – Fri  ·  7:00 am – 5:00 pm", bio: "24 years in structural repairs, foundation assessments, roof patching, and ceiling remediation. Fully insured and bonded.",                             rate: 120, eta: 60, distance: "4.1 mi", rating: 4.7, reviews: 89,  avatar: "TN", speciality: "Foundations & Roofing",   phone: "+1 (555) 815-7760" },
-    { name: "Rachel Bloom",   age: 43, title: "Structural Repair Specialist", yearsExp: 16, timings: "Mon – Sat  ·  8:00 am – 4:00 pm", bio: "Expert in drywall repair, crack injection, waterproofing, and structural patching. Known for quality finishes and meticulous work.",                     rate: 110, eta: 90, distance: "5.2 mi", rating: 4.5, reviews: 61,  avatar: "RB", speciality: "Drywall & Waterproofing",  phone: "+1 (555) 887-1423" },
+    { name:"Thomas Nguyen", age:49, title:"Licensed General Contractor", yearsExp:24, timings:"Mon – Fri · 7:00 am – 5:00 pm", bio:"24 years in structural repairs, foundation assessments, roof patching, and ceiling remediation. Fully insured and bonded.", rate:120, eta:60, distance:"4.1 mi", rating:4.7, reviews:89, avatar:"TN", speciality:"Foundations & Roofing", phone:"+1 (555) 815-7760" },
+    { name:"Rachel Bloom", age:43, title:"Structural Repair Specialist", yearsExp:16, timings:"Mon – Sat · 8:00 am – 4:00 pm", bio:"Expert in drywall repair, crack injection, waterproofing, and structural patching. Known for quality finishes and meticulous work.", rate:110, eta:90, distance:"5.2 mi", rating:4.5, reviews:61, avatar:"RB", speciality:"Drywall & Waterproofing", phone:"+1 (555) 887-1423" },
   ],
   appliance: [
-    { name: "Priya Sharma",   age: 35, title: "Senior Appliance Technician",  yearsExp: 12, timings: "Mon – Sat  ·  8:00 am – 7:00 pm", bio: "Factory-trained on all major brands. Specialises in washers, dryers, refrigerators, and dishwashers. Known for same-day parts sourcing.",               rate: 75,  eta: 35, distance: "2.0 mi", rating: 4.8, reviews: 134, avatar: "PS", speciality: "Washers, Dryers & Fridges", phone: "+1 (555) 926-4483" },
-    { name: "Greg Nakamura",  age: 52, title: "Appliance Repair Technician",  yearsExp: 28, timings: "Mon – Fri  ·  7:00 am – 4:00 pm", bio: "Veteran technician with expertise in older models and commercial-grade units. Authorised servicer for multiple appliance brands.",                       rate: 80,  eta: 55, distance: "3.3 mi", rating: 4.6, reviews: 203, avatar: "GN", speciality: "Commercial & Older Models", phone: "+1 (555) 034-6618" },
+    { name:"Priya Sharma", age:35, title:"Senior Appliance Technician", yearsExp:12, timings:"Mon – Sat · 8:00 am – 7:00 pm", bio:"Factory-trained on all major brands. Specialises in washers, dryers, refrigerators, and dishwashers. Known for same-day parts sourcing.", rate:75, eta:35, distance:"2.0 mi", rating:4.8, reviews:134, avatar:"PS", speciality:"Washers, Dryers & Fridges", phone:"+1 (555) 926-4483" },
+    { name:"Greg Nakamura", age:52, title:"Appliance Repair Technician", yearsExp:28, timings:"Mon – Fri · 7:00 am – 4:00 pm", bio:"Veteran technician with expertise in older models and commercial-grade units. Authorised servicer for multiple appliance brands.", rate:80, eta:55, distance:"3.3 mi", rating:4.6, reviews:203, avatar:"GN", speciality:"Commercial & Older Models", phone:"+1 (555) 034-6618" },
   ],
   general: [
-    { name: "Robert Mills",   age: 46, title: "Property Maintenance Specialist", yearsExp: 21, timings: "Mon – Sat  ·  7:00 am – 6:00 pm", bio: "21 years of all-round maintenance: painting, door/window repair, minor carpentry, and handyman services. Reliable and punctual.",                  rate: 80,  eta: 40, distance: "2.5 mi", rating: 4.6, reviews: 56,  avatar: "RM", speciality: "Carpentry, Painting & Handyman", phone: "+1 (555) 107-3392" },
-    { name: "Fatima Diallo",  age: 31, title: "Maintenance Technician",       yearsExp: 7,  timings: "Mon – Fri  ·  8:00 am – 5:00 pm", bio: "Detail-oriented technician focused on tile work, grout, minor plumbing fixes, and touch-up painting. Great reviews for thoroughness.",                  rate: 70,  eta: 60, distance: "3.7 mi", rating: 4.5, reviews: 44,  avatar: "FD", speciality: "Tile, Grout & Touch-Up Work",  phone: "+1 (555) 219-8854" },
+    { name:"Robert Mills", age:46, title:"Property Maintenance Specialist", yearsExp:21, timings:"Mon – Sat · 7:00 am – 6:00 pm", bio:"21 years of all-round maintenance: painting, door/window repair, minor carpentry, and handyman services. Reliable and punctual.", rate:80, eta:40, distance:"2.5 mi", rating:4.6, reviews:56, avatar:"RM", speciality:"Carpentry, Painting & Handyman", phone:"+1 (555) 107-3392" },
+    { name:"Fatima Diallo", age:31, title:"Maintenance Technician", yearsExp:7, timings:"Mon – Fri · 8:00 am – 5:00 pm", bio:"Detail-oriented technician focused on tile work, grout, minor plumbing fixes, and touch-up painting. Great reviews for thoroughness.", rate:70, eta:60, distance:"3.7 mi", rating:4.5, reviews:44, avatar:"FD", speciality:"Tile, Grout & Touch-Up Work", phone:"+1 (555) 219-8854" },
   ],
 };
 
 // ─── Equipment catalog ─────────────────────────────────────────────────────
 const EQUIPMENT_CATALOG = {
-  washing_machine: { label: "Washing Machine",  shelfLife: "10–12 years", health: 62, replaceBy: "Est. 2027", replaceCost: "$550 – $900",     repairCost: "$120 – $280", recommend: "repair"   },
-  refrigerator:    { label: "Refrigerator",      shelfLife: "13–17 years", health: 45, replaceBy: "Est. 2026", replaceCost: "$900 – $2,200",   repairCost: "$200 – $450", recommend: "replace"  },
-  hvac_unit:       { label: "HVAC Unit",          shelfLife: "15–20 years", health: 71, replaceBy: "Est. 2030", replaceCost: "$3,500 – $7,200", repairCost: "$150 – $600", recommend: "repair"   },
-  dishwasher:      { label: "Dishwasher",         shelfLife: "9–12 years",  health: 38, replaceBy: "Est. 2026", replaceCost: "$450 – $1,100",   repairCost: "$100 – $250", recommend: "replace"  },
-  water_heater:    { label: "Water Heater",        shelfLife: "8–12 years",  health: 55, replaceBy: "Est. 2027", replaceCost: "$800 – $1,600",   repairCost: "$150 – $400", recommend: "repair"   },
-  dryer:           { label: "Dryer",               shelfLife: "10–13 years", health: 60, replaceBy: "Est. 2028", replaceCost: "$400 – $800",     repairCost: "$80 – $200",  recommend: "repair"   },
-  oven:            { label: "Oven / Range",         shelfLife: "13–15 years", health: 72, replaceBy: "Est. 2031", replaceCost: "$700 – $1,500",   repairCost: "$100 – $300", recommend: "repair"   },
+  washing_machine: { label:"Washing Machine", shelfLife:"10–12 years", health:62, replaceBy:"Est. 2027", replaceCost:"$550 – $900", repairCost:"$120 – $280", recommend:"repair" },
+  refrigerator:    { label:"Refrigerator", shelfLife:"13–17 years", health:45, replaceBy:"Est. 2026", replaceCost:"$900 – $2,200", repairCost:"$200 – $450", recommend:"replace" },
+  hvac_unit:       { label:"HVAC Unit", shelfLife:"15–20 years", health:71, replaceBy:"Est. 2030", replaceCost:"$3,500 – $7,200", repairCost:"$150 – $600", recommend:"repair" },
+  dishwasher:      { label:"Dishwasher", shelfLife:"9–12 years", health:38, replaceBy:"Est. 2026", replaceCost:"$450 – $1,100", repairCost:"$100 – $250", recommend:"replace" },
+  water_heater:    { label:"Water Heater", shelfLife:"8–12 years", health:55, replaceBy:"Est. 2027", replaceCost:"$800 – $1,600", repairCost:"$150 – $400", recommend:"repair" },
+  dryer:           { label:"Dryer", shelfLife:"10–13 years", health:60, replaceBy:"Est. 2028", replaceCost:"$400 – $800", repairCost:"$80 – $200", recommend:"repair" },
+  oven:            { label:"Oven / Range", shelfLife:"13–15 years", health:72, replaceBy:"Est. 2031", replaceCost:"$700 – $1,500", repairCost:"$100 – $300", recommend:"repair" },
 };
 const EQUIPMENT_KEYWORDS = {
-  washing_machine: ["washing machine", "washer"],
-  refrigerator:    ["refrigerator", "fridge", "freezer"],
-  hvac_unit:       ["hvac unit", "ac unit", "air conditioning unit", "heating unit"],
+  washing_machine: ["washing machine","washer"],
+  refrigerator:    ["refrigerator","fridge","freezer"],
+  hvac_unit:       ["hvac unit","ac unit","air conditioning unit","heating unit"],
   dishwasher:      ["dishwasher"],
-  water_heater:    ["water heater", "hot water heater", "boiler"],
-  dryer:           ["dryer", "tumble dryer"],
-  oven:            ["oven", "range", "stove"],
+  water_heater:    ["water heater","hot water heater","boiler"],
+  dryer:           ["dryer","tumble dryer"],
+  oven:            ["oven","range","stove"],
 };
 function detectEquipmentKey(text) {
   const lower = (text || "").toLowerCase();
@@ -55,6 +55,46 @@ function detectEquipmentKey(text) {
   }
   return null;
 }
+
+// ─── Tools catalog ─────────────────────────────────────────────────────────
+const TOOLS_CATALOG = {
+  plumbing: [
+    { id:"pl1", name:"Pipe Wrench (14 in)", desc:"Heavy-duty wrench for tightening and loosening iron pipe fittings", mandatory:true,  svg:"wrench"  },
+    { id:"pl2", name:"PTFE Thread Tape",    desc:"Sealing tape for threaded pipe connections — prevents leaks",     mandatory:true,  svg:"tape"    },
+    { id:"pl3", name:"Drain Snake (15 ft)", desc:"Flexible auger clears stubborn blockages deep in drain lines",    mandatory:false, svg:"coil"    },
+    { id:"pl4", name:"Pipe Repair Clamp",   desc:"Emergency split-pipe repair clamp — stops active leaks fast",    mandatory:false, svg:"clamp"   },
+  ],
+  electrical: [
+    { id:"el1", name:"Non-Contact Voltage Tester", desc:"Safely detects live circuits before any work begins",              mandatory:true,  svg:"zap"     },
+    { id:"el2", name:"Wire Stripper / Crimper",     desc:"Professional tool for wire preparation and safe terminations",    mandatory:true,  svg:"cut"     },
+    { id:"el3", name:"Digital Multimeter",           desc:"Measures voltage, current, and resistance for precise diagnosis",mandatory:false, svg:"meter"   },
+    { id:"el4", name:"Circuit Breaker (15 A)",       desc:"Standard replacement breaker — brought if existing unit fails",  mandatory:false, svg:"shield"  },
+  ],
+  hvac: [
+    { id:"hv1", name:"Manifold Gauge Set",       desc:"Reads AC refrigerant pressure — essential for diagnosis",         mandatory:true,  svg:"gauge"   },
+    { id:"hv2", name:"Replacement HVAC Filter",  desc:"Standard 16×20 filter — size confirmed on arrival",              mandatory:false, svg:"filter"  },
+    { id:"hv3", name:"Condenser Coil Cleaner",   desc:"Biodegradable spray for restoring coil heat-exchange efficiency", mandatory:false, svg:"spray"   },
+    { id:"hv4", name:"Programmable Thermostat",  desc:"Digital replacement thermostat — included if current unit fails", mandatory:false, svg:"temp"    },
+  ],
+  structural: [
+    { id:"st1", name:"Drywall Repair Kit",  desc:"Joint compound, fibreglass mesh tape, and 6-inch putty knife",    mandatory:true,  svg:"wall"    },
+    { id:"st2", name:"Electronic Stud Finder", desc:"Locates wall studs for secure anchoring and load-bearing work", mandatory:true,  svg:"sensor"  },
+    { id:"st3", name:"Epoxy Crack Injection Kit", desc:"Two-part epoxy resin for sealing structural cracks",         mandatory:false, svg:"syringe" },
+    { id:"st4", name:"Flexible Waterproof Sealant", desc:"Moisture-barrier sealant for bathrooms and exterior gaps", mandatory:false, svg:"drop"    },
+  ],
+  appliance: [
+    { id:"ap1", name:"Clamp Multimeter",    desc:"Diagnoses motor and wiring faults in appliances non-invasively",  mandatory:true,  svg:"meter"   },
+    { id:"ap2", name:"Appliance Parts Kit", desc:"Belts, hoses, door gaskets for Whirlpool, LG, Samsung & GE",     mandatory:true,  svg:"parts"   },
+    { id:"ap3", name:"Refrigerant Leak Detector", desc:"Electronic sensor for pinpointing refrigerant leaks",       mandatory:false, svg:"sensor"  },
+    { id:"ap4", name:"Drum Bearing & Seal Kit",   desc:"Replacement bearing set for washers and dryers",            mandatory:false, svg:"gear"    },
+  ],
+  general: [
+    { id:"gn1", name:"Professional Tool Kit", desc:"Hammer, screwdrivers, pliers, tape measure, level — full set",  mandatory:true,  svg:"kit"     },
+    { id:"gn2", name:"Cordless Power Drill",   desc:"18V drill with full assorted bit set for mounting and fixing",  mandatory:true,  svg:"drill"   },
+    { id:"gn3", name:"Caulk & Sealant Gun",    desc:"Precision ratchet applicator for weatherproofing and sealing", mandatory:false, svg:"caulk"   },
+    { id:"gn4", name:"Personal Safety Equipment", desc:"Heavy-duty gloves, safety goggles, non-slip work boots",    mandatory:true,  svg:"shield"  },
+  ],
+};
 
 // ─── Service categories + quick prompts ────────────────────────────────────
 const SERVICE_CATEGORIES = [
@@ -75,7 +115,9 @@ const QUICK_PROMPTS = [
 ];
 
 // ─── System prompt ─────────────────────────────────────────────────────────
-const SYSTEM_PROMPT = `You are RepairGenie, a professional AI property maintenance assistant. The user has already seen a welcome screen.
+const SYSTEM_PROMPT = `You are RepairGenie, a professional AI property maintenance assistant.
+
+IMAGE ANALYSIS: If the user sends an image, analyze it immediately. In 1–2 sentences describe the visible damage or fault. Then continue with Stage 1 questions for any missing details.
 
 FLOW — follow these stages in order:
 
@@ -83,15 +125,14 @@ STAGE 1 — GATHER DETAILS
 Ask one clarifying question at a time. Collect:
   a) Problem description (if not provided)
   b) Location / room
-  c) Urgency — ask: "Is this an emergency or urgent, or can it wait?"
+  c) Urgency — ask: "Is this an emergency or can it wait?"
   d) Category — derive from context; only ask if genuinely ambiguous
 
-If the message is unclear or unrelated to maintenance, reply: "I did not quite catch that. Could you describe the maintenance issue in a bit more detail?"
-
-If the issue is an emergency (flooding, gas smell, electrical fire, structural collapse), immediately flag it and proceed to the ticket without further questions. Advise contacting emergency services if there is risk to life.
+If unclear, reply: "I did not quite catch that. Could you describe the maintenance issue in a bit more detail?"
+If emergency (flooding, gas smell, electrical fire, structural collapse): flag immediately and proceed to ticket. Advise contacting emergency services if risk to life.
 
 STAGE 2 — OUTPUT TICKET
-Once you have all four details, output the ticket in EXACTLY this format with nothing before the opening delimiter:
+Once you have all four details, output:
 
 ---TICKET_START---
 ID: RG-[5 random digits]
@@ -102,24 +143,17 @@ Priority: [Emergency | High | Medium | Low]
 Est. Response: [timeframe]
 ---TICKET_END---
 
-After the block write exactly one sentence: "A nearby professional has been matched — please review their details below and confirm to proceed."
+After the block write exactly: "A nearby professional has been matched — please review their details below and confirm to proceed."
 
 STAGE 3 — AWAIT CONFIRMATION
-Wait. If the user asks to see an alternative professional, reply with SHOW_ALTERNATIVE and nothing else.
-If the user confirms service, reply with SERVICE_CONFIRMED and nothing else.
+Wait. If user asks for alternative professional reply SHOW_ALTERNATIVE and nothing else.
+If user confirms reply SERVICE_CONFIRMED and nothing else.
 
 STAGE 4 — POST-CONFIRMATION
-Call the user by "you" naturally. Confirm booking. Briefly mention the professional will arrive shortly. Ask if new parts or equipment are needed — if the issue likely requires a replacement part or device, output an EQUIPMENT_NEEDED block:
-
----EQUIPMENT_START---
-Name: [part or device name]
-Reason: [why it is needed]
----EQUIPMENT_END---
-
-Then ask: "Is there anything else you need help with?"
+Confirm booking briefly. Mention professional ETA. Ask if anything else is needed.
 
 STAGE 5 — RESOLUTION
-When the user reports the issue is resolved or fixed, output:
+When user reports issue resolved, output:
 ---RESOLVED_START---
 TicketID: [ticket id]
 Resolution: [one sentence: what was done]
@@ -127,7 +161,7 @@ Resolution: [one sentence: what was done]
 Then ask: "How was your service experience today?"
 
 RULES:
-- Professional tone. No emojis. No markdown (no **, ##, etc).
+- Professional tone. No emojis. No markdown (no **, ##).
 - Keep replies under 70 words except structured blocks.
 - Category must be lowercase in ticket block.
 - One question at a time.
@@ -206,6 +240,38 @@ function Stars({ rating }) {
   );
 }
 
+// ─── ToolIcon ────────────────────────────────────────────────────────────────
+function ToolIcon({ svg, size = 22, color = "#1a5cff" }) {
+  const paths = {
+    wrench:  <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>,
+    tape:    <><rect x="2" y="9" width="20" height="6" rx="3"/><path d="M12 9V3M12 21v-6"/></>,
+    coil:    <><path d="M12 2a5 5 0 015 5c0 4-5 11-5 11S7 11 7 7a5 5 0 015-5z"/><circle cx="12" cy="7" r="2"/></>,
+    clamp:   <><rect x="3" y="8" width="18" height="8" rx="2"/><path d="M8 8V5a1 1 0 011-1h6a1 1 0 011 1v3"/></>,
+    zap:     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>,
+    cut:     <><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/></>,
+    meter:   <><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 10h.01M12 7v3m0 0l3 1.5"/></>,
+    shield:  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>,
+    gauge:   <><path d="M3 12a9 9 0 1018 0 9 9 0 00-18 0"/><path d="M12 7v5l3 3"/></>,
+    filter:  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>,
+    spray:   <><path d="M5 3h9M5 7h9M3 11h9"/><circle cx="17" cy="17" r="5"/><path d="M17 14v3l2 1"/></>,
+    temp:    <path d="M14 14.76V3.5a2.5 2.5 0 00-5 0v11.26a4.5 4.5 0 105 0z"/>,
+    wall:    <><rect x="2" y="4" width="20" height="16" rx="1"/><path d="M2 10h20M2 16h20M8 4v6M14 4v6M8 16v4M14 16v4"/></>,
+    sensor:  <><circle cx="12" cy="12" r="3"/><path d="M6.3 6.3a8 8 0 000 11.4M17.7 6.3a8 8 0 010 11.4"/></>,
+    syringe: <><path d="M18 2l4 4-4 4M22 6H10"/><path d="M10 6v10a2 2 0 002 2h0a2 2 0 002-2V6"/><path d="M7 22l3-3"/></>,
+    drop:    <path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/>,
+    parts:   <><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></>,
+    gear:    <><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></>,
+    kit:     <><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16M9 12h6"/></>,
+    drill:   <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>,
+    caulk:   <><path d="M7 16.5A5.5 5.5 0 0117 12V7"/><path d="M12 2v5M7 7h10"/><circle cx="7" cy="19" r="2"/></>,
+  };
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      {paths[svg] || paths.wrench}
+    </svg>
+  );
+}
+
 // ─── TicketCard ─────────────────────────────────────────────────────────────
 function TicketCard({ ticket }) {
   const PRIORITY = {
@@ -258,7 +324,6 @@ function ProfessionalCard({ pro, proIndex, totalPros, confirmed, resolved, onCon
         )}
       </div>
 
-      {/* Profile row */}
       <div style={{ display: "flex", gap: 12, marginBottom: 14, paddingBottom: 14, borderBottom: "1px solid #e4eaf2" }}>
         <div style={{ width: 46, height: 46, borderRadius: 10, background: "#0f1623", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,.85)", fontSize: 12, fontWeight: 600, flexShrink: 0, letterSpacing: ".5px" }}>
           {pro.avatar}
@@ -273,12 +338,10 @@ function ProfessionalCard({ pro, proIndex, totalPros, confirmed, resolved, onCon
         </div>
       </div>
 
-      {/* Bio */}
       <div style={{ fontSize: 13, color: "#6b7a90", lineHeight: 1.65, marginBottom: 14, fontWeight: 400 }}>
         {pro.bio}
       </div>
 
-      {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 14 }}>
         {[["Rate", `$${pro.rate}/hr`], ["ETA", `${pro.eta} min`], ["Distance", pro.distance]].map(([lbl, val]) => (
           <div key={lbl} style={{ background: "#f7f9fc", border: "1px solid #e4eaf2", borderRadius: 8, padding: "9px 10px" }}>
@@ -288,7 +351,6 @@ function ProfessionalCard({ pro, proIndex, totalPros, confirmed, resolved, onCon
         ))}
       </div>
 
-      {/* Detail rows */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 20px", marginBottom: 16, paddingBottom: 16, borderBottom: "1px solid #e4eaf2" }}>
         {[["Experience", `${pro.yearsExp} years`], ["Speciality", pro.speciality], ["Contact", pro.phone], ["Availability", pro.timings]].map(([lbl, val]) => (
           <div key={lbl}>
@@ -298,7 +360,6 @@ function ProfessionalCard({ pro, proIndex, totalPros, confirmed, resolved, onCon
         ))}
       </div>
 
-      {/* Actions */}
       {resolved ? (
         <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 13px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8 }}>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", flexShrink: 0 }} />
@@ -315,10 +376,9 @@ function ProfessionalCard({ pro, proIndex, totalPros, confirmed, resolved, onCon
       ) : (
         <div style={{ display: "flex", gap: 8 }}>
           <button className="rg-confirm-btn" onClick={onConfirm}>Confirm Service</button>
-          {canDecline && (
+          {canDecline ? (
             <button className="rg-decline-btn" onClick={onDecline}>Try Another</button>
-          )}
-          {!canDecline && (
+          ) : (
             <button className="rg-decline-btn" onClick={onDecline}>Decline</button>
           )}
         </div>
@@ -343,7 +403,6 @@ function EquipmentCard({ equipKey }) {
       </div>
       <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 20, fontWeight: 700, color: "#0f1623", marginBottom: 12 }}>{eq.label}</div>
 
-      {/* Health bar */}
       <div style={{ marginBottom: 14 }}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
           <span style={{ fontSize: 10, fontWeight: 600, color: "#6b7a90", letterSpacing: "1px", textTransform: "uppercase" }}>Current Health</span>
@@ -362,6 +421,79 @@ function EquipmentCard({ equipKey }) {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+// ─── ToolsCard ────────────────────────────────────────────────────────────────
+function ToolsCard({ category, onAddTool, onSkipTool, toolDecisions }) {
+  const tools = TOOLS_CATALOG[category] || TOOLS_CATALOG.general;
+  const mandatory = tools.filter(t => t.mandatory);
+  const optional  = tools.filter(t => !t.mandatory);
+
+  return (
+    <div className="rg-tools-card">
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
+        <span style={{ fontSize:10.5, fontWeight:600, letterSpacing:"1.4px", textTransform:"uppercase", color:"#6b7a90" }}>Service Tools & Materials</span>
+        <span style={{ fontSize:11, color:"#6b7a90" }}>{tools.length} items</span>
+      </div>
+
+      {mandatory.length > 0 && (
+        <div style={{ marginBottom:14 }}>
+          <div style={{ fontSize:10, fontWeight:600, color:"#16a34a", letterSpacing:"1.1px", textTransform:"uppercase", marginBottom:10, display:"flex", alignItems:"center", gap:6 }}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Included — professional will bring these
+          </div>
+          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+            {mandatory.map(t => (
+              <div key={t.id} style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 12px", background:"#f0fdf4", border:"1px solid #d1fae5", borderRadius:9 }}>
+                <div style={{ width:36, height:36, borderRadius:8, background:"#dcfce7", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  <ToolIcon svg={t.svg} size={18} color="#16a34a" />
+                </div>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ fontSize:13, fontWeight:600, color:"#0f1623" }}>{t.name}</div>
+                  <div style={{ fontSize:11.5, color:"#6b7a90", marginTop:1, lineHeight:1.4 }}>{t.desc}</div>
+                </div>
+                <span style={{ fontSize:10.5, fontWeight:600, color:"#16a34a", background:"#dcfce7", border:"1px solid #d1fae5", borderRadius:20, padding:"2px 8px", whiteSpace:"nowrap", flexShrink:0 }}>Included</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {optional.length > 0 && (
+        <div>
+          <div style={{ fontSize:10, fontWeight:600, color:"#6b7a90", letterSpacing:"1.1px", textTransform:"uppercase", marginBottom:10 }}>
+            Optional — would you like your professional to bring these?
+          </div>
+          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+            {optional.map(t => {
+              const dec = toolDecisions?.[t.id];
+              return (
+                <div key={t.id} style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 12px", background: dec === "added" ? "#f0f4ff" : dec === "skipped" ? "#fafafa" : "#fff", border:`1px solid ${dec === "added" ? "#c7d4ff" : dec === "skipped" ? "#e4eaf2" : "#e4eaf2"}`, borderRadius:9, opacity: dec === "skipped" ? 0.6 : 1, transition:"all .18s" }}>
+                  <div style={{ width:36, height:36, borderRadius:8, background: dec === "added" ? "#eef2ff" : "#f7f9fc", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    <ToolIcon svg={t.svg} size={18} color={dec === "added" ? "#1a5cff" : "#6b7a90"} />
+                  </div>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontSize:13, fontWeight:600, color: dec === "skipped" ? "#9ca3af" : "#0f1623", textDecoration: dec === "skipped" ? "line-through" : "none" }}>{t.name}</div>
+                    <div style={{ fontSize:11.5, color:"#6b7a90", marginTop:1, lineHeight:1.4 }}>{t.desc}</div>
+                  </div>
+                  {!dec ? (
+                    <div style={{ display:"flex", gap:6, flexShrink:0 }}>
+                      <button onClick={() => onAddTool(t.id)} style={{ padding:"5px 11px", background:"#0f1623", border:"none", borderRadius:7, color:"#fff", fontSize:12, fontFamily:"Inter,sans-serif", fontWeight:500, cursor:"pointer" }}>Add</button>
+                      <button onClick={() => onSkipTool(t.id)} style={{ padding:"5px 11px", background:"transparent", border:"1px solid #e4eaf2", borderRadius:7, color:"#6b7a90", fontSize:12, fontFamily:"Inter,sans-serif", fontWeight:500, cursor:"pointer" }}>Skip</button>
+                    </div>
+                  ) : dec === "added" ? (
+                    <span style={{ fontSize:11, fontWeight:600, color:"#1a5cff", background:"#eef2ff", border:"1px solid #c7d4ff", borderRadius:20, padding:"2px 9px", flexShrink:0 }}>Added</span>
+                  ) : (
+                    <span style={{ fontSize:11, color:"#9ca3af", flexShrink:0 }}>Skipped</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -420,8 +552,11 @@ export default function RepairGenieChat() {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [sessionStates, setSessionStates] = useState({});
   const [satStates, setSatStates]         = useState({});
+  const [toolDecisions, setToolDecisions] = useState({});
+  const [pendingImage, setPendingImage]   = useState(null);
   const bottomRef   = useRef(null);
   const textareaRef = useRef(null);
+  const fileRef     = useRef(null);
 
   const activeSession  = sessions.find(s => s.id === activeId) || sessions[0];
   const messages       = activeSession?.messages || [];
@@ -445,9 +580,11 @@ export default function RepairGenieChat() {
     const s = makeSession(sessionCounter);
     setSessions(prev => [s, ...prev]);
     setActiveId(s.id); setInput(""); setLoading(false);
+    setPendingImage(null);
   };
   const switchSession = (id) => {
     setActiveId(id); setInput(""); setLoading(false);
+    setPendingImage(null);
     if (typeof window !== "undefined" && window.innerWidth <= 860) setSidebarOpen(false);
   };
   const deleteSession = (id) => {
@@ -460,16 +597,23 @@ export default function RepairGenieChat() {
     setDeleteConfirm(null);
   };
 
-  const callAPI = async (msgs) => {
+  const callAPI = async (msgs, imageData = null) => {
+    const apiMsgs = msgs.map((m, idx) => {
+      if (imageData && idx === msgs.length - 1 && m.role === "user") {
+        return {
+          role: "user",
+          content: [
+            { type: "image", source: { type: "base64", media_type: imageData.mimeType, data: imageData.base64 } },
+            { type: "text", text: m.content || "Please analyze this image." },
+          ],
+        };
+      }
+      return { role: m.role, content: m.content };
+    });
     const res = await fetch("/api/messages", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        system: SYSTEM_PROMPT,
-        messages: msgs.map(m => ({ role: m.role, content: m.content })),
-      }),
+      body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1000, system:SYSTEM_PROMPT, messages:apiMsgs }),
     });
     if (!res.ok) {
       const code = res.status;
@@ -501,8 +645,20 @@ export default function RepairGenieChat() {
       const equipKey = equip ? detectEquipmentKey(equip.name + " " + equip.reason) : null;
       if (equipKey) updateSS(activeId, { equipKey });
       const clean = stripBlocks(raw);
-      updateSession(activeId, () => ({ messages: [...nextMsgs, { role: "assistant", content: clean, _equipKey: equipKey || undefined }] }));
+      const curSS = sessionStates[activeId] || {};
+      const toolCat = curSS.ticket?.category || cur?.ticket?.category || "general";
+      updateSession(activeId, () => ({ messages: [...nextMsgs, { role: "assistant", content: clean, _equipKey: equipKey || undefined, _showTools: true, _toolCategory: toolCat }] }));
+      // Update localStorage ticket status to in_progress
+      try {
+        const existing = JSON.parse(localStorage.getItem("rg_live_tickets") || "[]");
+        const ticketId = cur?.ticket?.id;
+        if (ticketId) {
+          const updated = existing.map(t => t.id === ticketId ? { ...t, status: "in_progress", pro: cur?.pro?.name || t.pro } : t);
+          localStorage.setItem("rg_live_tickets", JSON.stringify(updated));
+        }
+      } catch(_) {}
     } catch (e) {
+      const cur2 = sessionStates[activeId] || cur;
       updateSession(activeId, () => ({
         messages: [...nextMsgs, { role: "assistant", content: `Service confirmed. ${pro?.name || "The technician"} will arrive in approximately ${pro?.eta || 30} minutes.` }],
       }));
@@ -533,6 +689,16 @@ export default function RepairGenieChat() {
     const resolvedMsg = { role: "user", content: "The issue has been resolved." };
     const nextMsgs = [...activeSession.messages, resolvedMsg];
     updateSession(activeId, () => ({ messages: nextMsgs }));
+    // Update localStorage ticket status to resolved
+    try {
+      const cur2 = sessionStates[activeId];
+      const ticketId = cur2?.ticket?.id;
+      if (ticketId) {
+        const existing = JSON.parse(localStorage.getItem("rg_live_tickets") || "[]");
+        const updated = existing.map(t => t.id === ticketId ? { ...t, status: "resolved" } : t);
+        localStorage.setItem("rg_live_tickets", JSON.stringify(updated));
+      }
+    } catch(_) {}
     setLoading(true);
     try {
       const raw   = await callAPI(nextMsgs);
@@ -554,15 +720,39 @@ export default function RepairGenieChat() {
     updateSession(activeId, s => ({ messages: [...s.messages, { role: "assistant", content: reply }] }));
   };
 
+  const handleToolDecision = (toolId, decision) => {
+    setToolDecisions(prev => ({
+      ...prev,
+      [activeId]: { ...(prev[activeId] || {}), [toolId]: decision },
+    }));
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !file.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataUrl = ev.target.result;
+      const base64 = dataUrl.split(",")[1];
+      setPendingImage({ base64, mimeType: file.type, previewUrl: dataUrl });
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
   const send = async (text) => {
     const msg = (text ?? input).trim();
-    if (!msg || loading) return;
+    if ((!msg && !pendingImage) || loading) return;
+    const capturedImage = pendingImage;
     setInput("");
-    const nextMsgs = [...activeSession.messages, { role: "user", content: msg }];
+    setPendingImage(null);
+    const userContent = msg || (capturedImage ? "Please analyze this image." : "");
+    const userMsg = { role: "user", content: userContent, _imagePreview: capturedImage?.previewUrl };
+    const nextMsgs = [...activeSession.messages, userMsg];
     updateSession(activeId, () => ({ messages: nextMsgs }));
     setLoading(true);
     try {
-      const raw      = await callAPI(nextMsgs);
+      const raw      = await callAPI(nextMsgs, capturedImage);
       const ticket   = extractTicket(raw);
       const resolved = extractResolved(raw);
       const clean    = stripBlocks(raw);
@@ -585,6 +775,12 @@ export default function RepairGenieChat() {
           messages: [...nextMsgs, { role: "assistant", content: clean, _ticket: ticket }],
           ticketCount: s.ticketCount + 1,
         }));
+        // Save to localStorage for dashboard sync
+        try {
+          const existing = JSON.parse(localStorage.getItem("rg_live_tickets") || "[]");
+          const liveEntry = { id: ticket.id, issue: ticket.issue, location: ticket.location, category: ticket.category, priority: ticket.priority.toLowerCase(), status: "pending", pro: proList[0].name, proAv: proList[0].avatar, elapsed: "0 min", sla: ticket.response, createdAt: Date.now() };
+          localStorage.setItem("rg_live_tickets", JSON.stringify([liveEntry, ...existing].slice(0, 20)));
+        } catch(_) {}
       } else if (resolved) {
         updateSS(activeId, { resolved: true });
         updateSession(activeId, () => ({ messages: [...nextMsgs, { role: "assistant", content: clean, _showSat: true }] }));
@@ -622,7 +818,7 @@ export default function RepairGenieChat() {
         .rg-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.18);animation:rgFadeIn .18s ease both}
         .rg-overlay.on{display:block}
 
-        /* ── Sidebar ── */
+        /* Sidebar */
         .rg-sidebar{width:var(--sw);flex-shrink:0;background:var(--navy);display:flex;flex-direction:column;transition:width .28s cubic-bezier(.22,1,.36,1),opacity .22s;overflow:hidden;position:relative;z-index:10}
         .rg-sidebar.closed{width:0;opacity:0;pointer-events:none}
         .rg-sb-head{padding:18px 16px 16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:10px;flex-shrink:0;cursor:pointer;text-decoration:none}
@@ -655,7 +851,7 @@ export default function RepairGenieChat() {
         .rg-user-name{font-size:12.5px;font-weight:500;color:rgba(255,255,255,.7)}
         .rg-user-plan{font-size:11px;color:rgba(255,255,255,.28);margin-top:1px}
 
-        /* ── Main ── */
+        /* Main */
         .rg-main{flex:1;display:flex;flex-direction:column;min-width:0;background:#fff}
         .rg-topbar{height:56px;padding:0 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#fff;flex-shrink:0;gap:12px}
         .rg-topbar-l{display:flex;align-items:center;gap:10px}
@@ -670,7 +866,7 @@ export default function RepairGenieChat() {
         .rg-topbar-btn{height:30px;padding:0 12px;background:transparent;border:1px solid var(--border);border-radius:6px;font-size:12.5px;font-family:'Inter',sans-serif;font-weight:500;color:var(--muted);cursor:pointer;transition:all .12s;white-space:nowrap}
         .rg-topbar-btn:hover{border-color:#b0bece;color:var(--navy)}
 
-        /* ── Messages ── */
+        /* Messages */
         .rg-msgs-wrap{flex:1;overflow-y:auto;padding:0;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
         .rg-msgs-wrap::-webkit-scrollbar{width:3px}
         .rg-msgs-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
@@ -715,6 +911,7 @@ export default function RepairGenieChat() {
         .rg-pro-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px 18px 16px;margin-top:10px;font-family:'Inter',sans-serif;box-shadow:0 1px 2px rgba(0,0,0,.03),0 6px 20px rgba(0,0,0,.055);animation:rgSlideUp .3s cubic-bezier(.22,1,.36,1) both}
         .rg-equip-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-top:8px;font-family:'Inter',sans-serif;box-shadow:0 1px 2px rgba(0,0,0,.03),0 4px 14px rgba(0,0,0,.05);animation:rgSlideUp .3s cubic-bezier(.22,1,.36,1) both}
         .rg-sat-card{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-top:8px;animation:rgSlideUp .3s cubic-bezier(.22,1,.36,1) both}
+        .rg-tools-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px 18px 16px;margin-top:10px;font-family:'Inter',sans-serif;box-shadow:0 1px 2px rgba(0,0,0,.03),0 6px 20px rgba(0,0,0,.055);animation:rgSlideUp .3s cubic-bezier(.22,1,.36,1) both}
 
         /* Buttons inside cards */
         .rg-confirm-btn{flex:1;padding:10px 0;background:var(--navy);border:none;border-radius:8px;color:#fff;font-size:13.5px;font-family:'Inter',sans-serif;font-weight:500;cursor:pointer;transition:background .12s}
@@ -766,7 +963,7 @@ export default function RepairGenieChat() {
       <div className={`rg-overlay ${sidebarOpen && typeof window !== "undefined" && window.innerWidth <= 860 ? "on" : ""}`} onClick={() => setSidebarOpen(false)} />
 
       <div className="rg-shell">
-        {/* ── SIDEBAR ── */}
+        {/* SIDEBAR */}
         <aside className={`rg-sidebar ${sidebarOpen ? "" : "closed"}`}>
           <div className="rg-sb-head" onClick={() => navigate("/")}>
             <div className="rg-sb-mark">
@@ -817,7 +1014,7 @@ export default function RepairGenieChat() {
           </div>
         </aside>
 
-        {/* ── MAIN ── */}
+        {/* MAIN */}
         <main className="rg-main">
           <div className="rg-topbar">
             <div className="rg-topbar-l">
@@ -869,12 +1066,14 @@ export default function RepairGenieChat() {
               <div className="rg-date-sep"><span>Today</span></div>
 
               {messages.map((m, i) => {
-                const isTicketMsg   = !!m._ticket;
-                const hasEquip      = !!m._equipKey;
-                const hasSat        = !!m._showSat;
-                const satKey        = `${activeId}_${i}`;
-                const showProCard   = isTicketMsg && ss && ss.ticket?.id === m._ticket?.id;
-                const showNoPros    = isTicketMsg && ss && ss.ticket?.id === m._ticket?.id && ss.noMorePros;
+                const isTicketMsg = !!m._ticket;
+                const hasEquip    = !!m._equipKey;
+                const hasSat      = !!m._showSat;
+                const hasTools    = !!m._showTools;
+                const toolCat     = m._toolCategory || "general";
+                const satKey      = `${activeId}_${i}`;
+                const showProCard = isTicketMsg && ss && ss.ticket?.id === m._ticket?.id;
+                const showNoPros  = isTicketMsg && ss && ss.ticket?.id === m._ticket?.id && ss.noMorePros;
 
                 return (
                   <div key={i}>
@@ -882,13 +1081,18 @@ export default function RepairGenieChat() {
                       {m.role === "assistant" && <div className="rg-av ai">RG</div>}
                       {m.role === "user"      && <div className="rg-av usr">PM</div>}
                       <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: m.role === "assistant" ? "min(78%,560px)" : "min(72%,520px)" }}>
+                        {m._imagePreview && (
+                          <div style={{ borderRadius:8, overflow:"hidden", border:"1px solid #e4eaf2", maxWidth:200, marginBottom:4 }}>
+                            <img src={m._imagePreview} alt="Uploaded" style={{ width:"100%", height:"auto", display:"block", maxHeight:150, objectFit:"cover" }} />
+                          </div>
+                        )}
                         {m.content && (
                           <div className={`rg-bubble ${m.role === "assistant" ? "ai" : "usr"}`} style={{ maxWidth: "100%" }}>
                             <MsgContent text={m.content} />
                           </div>
                         )}
                         {isTicketMsg && <TicketCard ticket={m._ticket} />}
-                        {hasEquip && <EquipmentCard equipKey={m._equipKey} />}
+                        {hasEquip && isTicketMsg && <EquipmentCard equipKey={m._equipKey} />}
                         {hasSat && !satStates[satKey] && (
                           <SatisfactionCard onSelect={(r) => submitSatisfaction(i, r)} />
                         )}
@@ -920,7 +1124,17 @@ export default function RepairGenieChat() {
                       </div>
                     )}
 
-                    {/* Equipment card shown separately when triggered via AI after confirmation */}
+                    {hasTools && (
+                      <div className="rg-card-wrap" style={{ animationDelay:".08s" }}>
+                        <ToolsCard
+                          category={toolCat}
+                          toolDecisions={toolDecisions[activeId] || {}}
+                          onAddTool={(id) => handleToolDecision(id, "added")}
+                          onSkipTool={(id) => handleToolDecision(id, "skipped")}
+                        />
+                      </div>
+                    )}
+
                     {hasEquip && !isTicketMsg && (
                       <div className="rg-card-wrap" style={{ animationDelay: ".1s" }}>
                         <EquipmentCard equipKey={m._equipKey} />
@@ -943,7 +1157,27 @@ export default function RepairGenieChat() {
 
           <div className="rg-input-zone">
             <div className="rg-input-inner">
+              {pendingImage && (
+                <div style={{ position:"relative", display:"inline-block", margin:"0 0 8px 0" }}>
+                  <img src={pendingImage.previewUrl} alt="Preview" style={{ width:52, height:52, borderRadius:7, objectFit:"cover", border:"1px solid #e4eaf2", display:"block" }} />
+                  <button onClick={() => setPendingImage(null)} style={{ position:"absolute", top:-5, right:-5, width:16, height:16, borderRadius:"50%", background:"#0f1623", border:"none", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#fff", fontSize:9, fontWeight:700, lineHeight:1 }}>&#x2715;</button>
+                </div>
+              )}
               <div className="rg-input-box">
+                <input ref={fileRef} type="file" accept="image/*" style={{ display:"none" }} onChange={handleFileSelect} />
+                <button
+                  className="rg-ico-btn"
+                  onClick={() => fileRef.current?.click()}
+                  style={{ width:32, height:32, flexShrink:0, alignSelf:"flex-end" }}
+                  title="Upload image for analysis"
+                  disabled={loading}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                </button>
                 <textarea
                   ref={textareaRef}
                   className="rg-chat-ta"
@@ -954,13 +1188,13 @@ export default function RepairGenieChat() {
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={onKey}
                 />
-                <button className="rg-send-btn" disabled={!input.trim() || loading} onClick={() => send()}>
+                <button className="rg-send-btn" disabled={(!input.trim() && !pendingImage) || loading} onClick={() => send()}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
                     <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </button>
               </div>
-              <div className="rg-input-foot">Enter to send · Shift+Enter for new line</div>
+              <div className="rg-input-foot">Enter to send · Shift+Enter for new line · Upload image for analysis</div>
             </div>
           </div>
         </main>

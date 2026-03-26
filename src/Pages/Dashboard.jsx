@@ -106,6 +106,17 @@ function formatDate(d) {
   return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
 }
 function catLabel(c) { return c.charAt(0).toUpperCase() + c.slice(1); }
+function calcElapsed(createdAt, now) {
+  if (!createdAt) return "—";
+  const diffMs = (now instanceof Date ? now.getTime() : now) - createdAt;
+  const totalSec = Math.floor(diffMs / 1000);
+  if (totalSec < 60) return `${totalSec}s`;
+  const mins = Math.floor(totalSec / 60);
+  if (mins < 60) return `${mins} min`;
+  const hrs = Math.floor(mins / 60);
+  const remMins = mins % 60;
+  return remMins > 0 ? `${hrs}h ${remMins}m` : `${hrs}h`;
+}
 
 // ─── SVG Charts ─────────────────────────────────────────────────────────────
 function LineChart({ values, labels, color = "#1a5cff", h = 130 }) {
@@ -235,12 +246,18 @@ function KPICard({ label, value, sub, trend, trendUp, sparkData, color = "#1a5cf
 }
 
 // ─── Page: Overview ──────────────────────────────────────────────────────────
-function OverviewPage({ onNavigate, allTickets, liveTickets }) {
+function OverviewPage({ onNavigate, allTickets, liveTickets, now }) {
   const active    = allTickets.filter(t => t.status !== "resolved").length;
   const resolved  = allTickets.filter(t => t.status === "resolved").length;
   const escalated = allTickets.filter(t => t.status === "escalated").length;
   const prosBusy  = PROFESSIONALS.filter(p => p.status === "busy").length;
   const critEquip = EQUIPMENT.filter(e => e.status === "critical").length;
+  const statusSegments = [
+    { label: "Resolved",    count: allTickets.filter(t => t.status === "resolved").length,    color: "#22c55e" },
+    { label: "In Progress", count: allTickets.filter(t => t.status === "in_progress").length, color: "#1a5cff" },
+    { label: "Pending",     count: allTickets.filter(t => t.status === "pending").length,     color: "#f59e0b" },
+    { label: "Escalated",   count: allTickets.filter(t => t.status === "escalated").length,   color: "#ef4444" },
+  ];
 
   return (
     <div className="db-page">
@@ -249,7 +266,7 @@ function OverviewPage({ onNavigate, allTickets, liveTickets }) {
         <div style={{ background:"#f0f4ff", border:"1px solid #c7d4ff", borderRadius:12, padding:"12px 16px", display:"flex", alignItems:"center", gap:10 }}>
           <div style={{ width:6, height:6, borderRadius:"50%", background:"#1a5cff", animation:"dbPulse 2s ease infinite" }} />
           <span style={{ fontSize:13, fontWeight:500, color:"#1a5cff" }}>{liveTickets.length} live ticket{liveTickets.length > 1 ? "s" : ""} incoming from RepairGenie chat</span>
-          <span style={{ fontSize:12, color:"#6b7a90", marginLeft:"auto" }}>Auto-synced · updating every 8s</span>
+          <span style={{ fontSize:12, color:"#6b7a90", marginLeft:"auto" }}>Auto-synced · updating every 3s</span>
         </div>
       )}
 
@@ -289,14 +306,14 @@ function OverviewPage({ onNavigate, allTickets, liveTickets }) {
           </div>
           <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16 }}>
             <div style={{ position:"relative", display:"flex", alignItems:"center", justifyContent:"center" }}>
-              <DonutChart data={STATUS_SEGMENTS} size={128} thickness={20} />
+              <DonutChart data={statusSegments} size={128} thickness={20} />
               <div style={{ position:"absolute", textAlign:"center" }}>
                 <div style={{ fontSize:26, fontWeight:800, color:"#0f1623", lineHeight:1, fontFamily:"'Inter',sans-serif", letterSpacing:"-0.5px" }}>{allTickets.length}</div>
                 <div style={{ fontSize:10, color:"#6b7a90", letterSpacing:"1px", textTransform:"uppercase" }}>Total</div>
               </div>
             </div>
             <div style={{ width:"100%", display:"flex", flexDirection:"column", gap:7 }}>
-              {STATUS_SEGMENTS.map(s => (
+              {statusSegments.map(s => (
                 <div key={s.label} style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
                   <span style={{ display:"flex", alignItems:"center", gap:7, fontSize:12, color:"#6b7a90" }}>
                     <span style={{ width:8, height:8, borderRadius:"50%", background:s.color, flexShrink:0 }} />{s.label}
@@ -349,7 +366,7 @@ function OverviewPage({ onNavigate, allTickets, liveTickets }) {
                         <span style={{ fontSize:12, color:"#9ca3af" }}>Unassigned</span>
                       )}
                     </td>
-                    <td><span style={{ fontSize:12, color:"#6b7a90" }}>{t.elapsed}</span></td>
+                    <td><span style={{ fontSize:12, color:"#6b7a90" }}>{t.createdAt ? calcElapsed(t.createdAt, now) : (t.elapsed || "—")}</span></td>
                   </tr>
                 ))}
               </tbody>
@@ -419,7 +436,7 @@ function OverviewPage({ onNavigate, allTickets, liveTickets }) {
 }
 
 // ─── Page: Tickets ───────────────────────────────────────────────────────────
-function TicketsPage({ allTickets }) {
+function TicketsPage({ allTickets, now }) {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const tabs = [
@@ -478,7 +495,7 @@ function TicketsPage({ allTickets }) {
                       </div>
                     ) : <span style={{ fontSize:12, color:"#9ca3af" }}>Unassigned</span>}
                   </td>
-                  <td><span style={{ fontSize:12, color:"#6b7a90" }}>{t.elapsed}</span></td>
+                  <td><span style={{ fontSize:12, color:"#6b7a90" }}>{t.createdAt ? calcElapsed(t.createdAt, now) : (t.elapsed || "—")}</span></td>
                   <td><span style={{ fontSize:12, color: t.sla === "—" ? "#6b7a90" : "#0f1623", fontWeight: t.sla === "—" ? 400 : 500 }}>{t.sla}</span></td>
                 </tr>
               ))}
@@ -491,13 +508,23 @@ function TicketsPage({ allTickets }) {
 }
 
 // ─── Page: Professionals ─────────────────────────────────────────────────────
-function ProfessionalsPage() {
-  const busy  = PROFESSIONALS.filter(p => p.status === "busy").length;
-  const avail = PROFESSIONALS.filter(p => p.status === "available").length;
+function ProfessionalsPage({ liveTickets }) {
+  const liveJobMap = {};
+  (liveTickets || []).forEach(t => {
+    if (t.pro && t.pro !== "Unassigned" && t.status !== "resolved") {
+      liveJobMap[t.pro] = t.id;
+    }
+  });
+  const mergedPros = PROFESSIONALS.map(p => {
+    const liveJob = liveJobMap[p.name];
+    return liveJob ? { ...p, status: "busy", job: liveJob } : p;
+  });
+  const busy  = mergedPros.filter(p => p.status === "busy").length;
+  const avail = mergedPros.filter(p => p.status === "available").length;
   return (
     <div className="db-page">
       <div style={{ display:"flex", gap:12, marginBottom:20 }}>
-        {[["Total Field Staff", PROFESSIONALS.length, "#0f1623"],["On Active Jobs", busy, "#1a5cff"],["Available", avail, "#16a34a"],["Offline", PROFESSIONALS.filter(p => p.status==="offline").length, "#6b7a90"]].map(([l,v,c]) => (
+        {[["Total Field Staff", mergedPros.length, "#0f1623"],["On Active Jobs", busy, "#1a5cff"],["Available", avail, "#16a34a"],["Offline", mergedPros.filter(p => p.status==="offline").length, "#6b7a90"]].map(([l,v,c]) => (
           <div key={l} style={{ flex:1, background:"#fff", border:"1px solid #e4eaf2", borderRadius:16, padding:"16px 18px" }}>
             <div style={{ fontSize:11, fontWeight:600, letterSpacing:"1.3px", textTransform:"uppercase", color:"#6b7a90", marginBottom:8 }}>{l}</div>
             <div style={{ fontSize:32, fontWeight:800, color:c, lineHeight:1, fontFamily:"'Inter',sans-serif", letterSpacing:"-0.5px" }}>{v}</div>
@@ -505,7 +532,7 @@ function ProfessionalsPage() {
         ))}
       </div>
       <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14 }}>
-        {PROFESSIONALS.map(p => {
+        {mergedPros.map(p => {
           const st = STATUS_PRO[p.status];
           return (
             <div key={p.name} className="db-card" style={{ padding:18 }}>
@@ -754,14 +781,34 @@ export default function Dashboard() {
       try {
         const stored = JSON.parse(localStorage.getItem("rg_live_tickets") || "[]");
         setLiveTickets(stored);
+        setSecondsAgo(0);
       } catch(_) {}
     };
     load();
-    const t = setInterval(load, 8000);
-    return () => clearInterval(t);
+    const t = setInterval(load, 3000);
+    window.addEventListener("storage", load);
+    return () => { clearInterval(t); window.removeEventListener("storage", load); };
   }, []);
 
   const allTickets = [...liveTickets, ...TICKETS];
+
+  const dynamicNotifications = [
+    ...liveTickets.map(t => ({
+      text: `${t.id} ${t.status === "resolved" ? "resolved" : "created"} — ${t.issue.toLowerCase()}`,
+      time: calcElapsed(t.createdAt, now) + " ago",
+      type: t.priority === "emergency" || t.status === "escalated" ? "alert" : t.status === "resolved" ? "info" : "info",
+    })),
+    ...liveTickets
+      .filter(t => t.status === "escalated")
+      .map(t => ({
+        text: `${t.id} escalated — ${t.issue.toLowerCase()}`,
+        time: calcElapsed(t.createdAt, now) + " ago",
+        type: "alert",
+      })),
+  ];
+  const notifications = dynamicNotifications.length > 0
+    ? [...dynamicNotifications, ...NOTIFICATIONS].slice(0, 8)
+    : NOTIFICATIONS;
 
   const PAGE_TITLES = { overview:"Overview", tickets:"Tickets", professionals:"Professionals", equipment:"Equipment", analytics:"Analytics", properties:"Properties" };
 
@@ -912,16 +959,16 @@ export default function Dashboard() {
               <div style={{ position:"relative" }}>
                 <button className="db-notif-btn" onClick={() => setNotifOpen(v => !v)}>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                  <span className="db-notif-badge">{NOTIFICATIONS.length}</span>
+                  <span className="db-notif-badge">{notifications.length}</span>
                 </button>
                 {notifOpen && (
                   <div className="db-notif-drop">
                     <div style={{ padding:"12px 16px 8px", borderBottom:"1px solid #e4eaf2", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
                       <div style={{ fontSize:13, fontWeight:600, color:"#0f1623" }}>Notifications</div>
-                      <span style={{ fontSize:10, fontWeight:600, background:"#fef2f2", color:"#dc2626", border:"1px solid #fecaca", borderRadius:20, padding:"1px 7px" }}>{NOTIFICATIONS.length} unread</span>
+                      <span style={{ fontSize:10, fontWeight:600, background:"#fef2f2", color:"#dc2626", border:"1px solid #fecaca", borderRadius:20, padding:"1px 7px" }}>{notifications.length} unread</span>
                     </div>
-                    {NOTIFICATIONS.map((n, i) => (
-                      <div key={i} style={{ padding:"10px 16px", borderBottom: i < NOTIFICATIONS.length - 1 ? "1px solid #f5f7fa" : "none", display:"flex", gap:10 }}>
+                    {notifications.map((n, i) => (
+                      <div key={i} style={{ padding:"10px 16px", borderBottom: i < notifications.length - 1 ? "1px solid #f5f7fa" : "none", display:"flex", gap:10 }}>
                         <span style={{ width:6, height:6, borderRadius:"50%", background: n.type === "alert" ? "#ef4444" : n.type === "warn" ? "#f59e0b" : "#1a5cff", marginTop:4, flexShrink:0 }} />
                         <div>
                           <div style={{ fontSize:12.5, color:"#0f1623", lineHeight:1.5 }}>{n.text}</div>
@@ -941,9 +988,9 @@ export default function Dashboard() {
 
           {/* Page content */}
           <div className="db-content" onClick={() => notifOpen && setNotifOpen(false)}>
-            {activePage === "overview"       && <OverviewPage onNavigate={setActivePage} allTickets={allTickets} liveTickets={liveTickets} />}
-            {activePage === "tickets"        && <TicketsPage allTickets={allTickets} />}
-            {activePage === "professionals"  && <ProfessionalsPage />}
+            {activePage === "overview"       && <OverviewPage onNavigate={setActivePage} allTickets={allTickets} liveTickets={liveTickets} now={now} />}
+            {activePage === "tickets"        && <TicketsPage allTickets={allTickets} now={now} />}
+            {activePage === "professionals"  && <ProfessionalsPage liveTickets={liveTickets} />}
             {activePage === "equipment"      && <EquipmentPage />}
             {activePage === "analytics"      && <AnalyticsPage />}
             {activePage === "properties"     && <PropertiesPage />}
